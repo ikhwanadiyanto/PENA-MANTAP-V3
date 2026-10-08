@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PENA MANTAP - Penilaian Bintang Berlevel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        /* BACKGROUND GRADASI ENERGETIK PREMIUM */
+        body { 
+            background: linear-gradient(135deg, #f77062 0%, #fe5196 100%); 
+            padding: 25px; 
+            min-height: 100vh; 
+            color: #334155; 
+        }
+
+        /* CONTAINER DENGAN EFEK GLASSMORPHISM HALUS */
+        .container { 
+            max-width: 1600px; 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 30px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+            padding: 30px; 
+        }
+        
+        /* HEADER SECTION STYLE PREMIUM */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 3px dashed #fed7aa; 
+            padding-bottom: 25px; 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+        .header-title { display: flex; align-items: center; gap: 20px; position: relative; }
+        
+        /* LOGO BUNDAR INTERAKTIF DENGAN ANIMASI */
+        .logo-container {
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6); 
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2px; 
+            box-shadow: 0 0 20px rgba(59,130,246,0.5);
+            animation: pulse-glow 2s infinite;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+        .logo-container:hover::after {
+            content: "Ubah";
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            font-size: 10px;
+            text-align: center;
+            padding: 2px 0;
+            font-weight: 600;
+        }
+        .logo-custom { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(59,130,246,0.5); }
+            50% { transform: scale(1.04); box-shadow: 0 0 32px rgba(59,130,246,0.85); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(59,130,246,0.5); }
+        }
+
+        .header-title h1 { font-size: 26px; color: #1e1b4b; font-weight: 700; }
+        .header-title p { font-size: 14px; color: #64748b; font-weight: 500; }
+        
+        /* PANEL UTAMA TOMBOL */
+        .button-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        
+        .btn { 
+            padding: 12px 22px; 
+            border: none; 
+            border-radius: 16px; 
+            color: #fff; 
+            font-weight: 600; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            font-size: 14px; 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            text-decoration: none;
+        }
+        .btn:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* TOMBOL PELANGGARAN KUSTOM */
+        .btn-pelanggaran {
+            background: #000000 !important;
+            color: #ef4444 !important;
+            font-weight: 700;
+            border: 2px solid #ef4444;
+        }
+        
+        .btn-save { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .btn-pdf { background: linear-gradient(135deg, #a855f7, #9333ea); }
+        .btn-back { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+        
+        /* TOMBOL KUSTOM */
+        .btn-danger { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        .btn-warning { background: linear-gradient(135deg, #ea580c, #c2410c); }
+        .btn-success { background: linear-gradient(135deg, #16a34a, #15803d); }
+        
+        .select-poin {
+            padding: 12px;
+            border-radius: 16px;
+            border: 2px solid #cbd5e1;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        /* BUNGKUS TABEL */
+        .table-wrap { 
+            overflow-x: auto; 
+            background: #fff; 
+            border-radius: 20px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        
+        /* HEADER TABEL */
+        th { color: #fff; font-weight: 600; padding: 12px 4px; text-align: center; white-space: nowrap; }
+        .th-utama { background: #1e3a8a; }
+        .th-bintang { background: #db2777; width: 38px; font-size: 13px; font-weight: 700; }
+        .th-total { background: #059669; width: 65px; font-size: 13px; }
+        
+        /* KOLOM DAN BARIS */
+        td { padding: 10px 2px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
+        tr:hover { background-color: #f1f5f9 !important; }
+
+        .col-no { font-weight: 600; color: #64748b; width: 45px; }
+        
+        /* RUMUS NAMA PASTEL PREMIUM BERSELANG-SELING */
+        .col-nama { 
+            text-align: left; 
+            width: 240px; 
+            font-weight: 500; 
+            color: #475569; 
+            position: sticky; 
+            left: 0; 
+            z-index: 2; 
+            box-shadow: 4px 0 10px rgba(247, 112, 98, 0.08); 
+            border-right: 2px solid #fed7aa; 
+            padding-left: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        tr:nth-child(odd) .col-nama { background-color: #fff5f5 !important; }  
+        tr:nth-child(even) .col-nama { background-color: #fff7ed !important; } 
+        tr:hover .col-nama { background-color: #fecdd3 !important; }
+
+        /* GAYA BINTANG MULTI LEVEL INTERAKTIF DENGAN FONT ANGKA */
+        .star-box {
+            cursor: pointer;
+            font-size: 18px;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+            user-select: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .star-box:hover { transform: scale(1.3); }
+
+        /* FONT ANGKA DI DALAM BINTANG */
+        .star-num {
+            position: absolute;
+            font-size: 10px;
+            font-weight: 800;
+            color: #1e1b4b;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -40%);
+            pointer-events: none;
+            line-height: 1;
+            text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
+        }
+
+        /* LOGIKA WARNA BERDASARKAN TOTAL KLIK */
+        .star-box.lvl-1 { color: #ff8787 !important; text-shadow: 0 0 5px rgba(255,135,135,0.5); } 
+        .star-box.lvl-2 { color: #ffa94d !important; text-shadow: 0 0 5px rgba(255,169,77,0.5); }  
+        .star-box.lvl-3 { color: #ffd43b !important; text-shadow: 0 0 5px rgba(255,212,59,0.5); }  
+        .star-box.lvl-4 { color: #63e6be !important; text-shadow: 0 0 5px rgba(99,230,190,0.5); }  
+        .star-box.lvl-5 { color: #fab005 !important; text-shadow: 0 0 10px rgba(250,176,5,0.8); animation: gold-glow 1s infinite alternate; } 
+        .star-box.lvl-5 .star-num { color: #000 !important; }
+
+        @keyframes gold-glow {
+            0% { transform: scale(1); text-shadow: 0 0 4px #fab005; }
+            100% { transform: scale(1.15); text-shadow: 0 0 12px #ffde1a, 0 0 4px #fab005; }
+        }
+
+        /* BOX COUNTER TOTAL BINTANG */
+        .total-bintang {
+            font-weight: 700;
+            color: #059669;
+            background: #d1fae5;
+            padding: 4px 10px;
+            border-radius: 8px;
+            display: inline-block;
+            min-width: 45px;
+        }
+
+        /* SCROLLBAR PASTEL CERIA */
+        .table-wrap::-webkit-scrollbar { height: 10px; }
+        .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* CSS PRINT SETUP PERFECT A4 LANDSCAPE */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .container { box-shadow: none !important; padding: 0 !important; max-width: 100% !important; background: transparent !important; }
+            .button-group, .header-title p, .logo-container:hover::after, .select-poin { display: none !important; }
+            .header { border-bottom: 2px solid #000 !important; margin-bottom: 15px !important; padding-bottom: 8px !important; }
+            .table-wrap { overflow: visible !important; border: none !important; box-shadow: none !important; }
+            table { width: 100% !important; border: 1px solid #000 !important; font-size: 11px !important; table-layout: fixed !important; }
+            th, td { border: 1px solid #000 !important; padding: 6px 2px !important; color: #000 !important; }
+            th { background: #1e3a8a !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .th-bintang { background: #db2777 !important; width: calc((100% - 350px) / 25) !important; }
+            .th-total { background: #059669 !important; width: 60px !important; }
+            .col-nama { position: static !important; background: transparent !important; border-right: 1px solid #000 !important; width: 240px !important; }
+            tr:nth-child(odd) .col-nama { background: #fff !important; }
+            tr:nth-child(even) .col-nama { background: #f8fafc !important; }
+            .star-box { font-size: 14px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .star-num { font-size: 8px !important; }
+            .total-bintang { background: transparent !important; padding: 0 !important; color: #000 !important; font-size: 12px !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-title">
+            <div class="logo-container" onclick="document.getElementById('inputLogoManual').click();" title="Klik untuk ganti logo">
+                <img id="tampilanLogo" src="image_480e7c.png" alt="Logo Mapel" class="logo-custom">
+            </div>
+            <input type="file" id="inputLogoManual" accept="image/*" style="display: none;" onchange="prosesUnggahLogo(this)">
+            
+            <div>
+                <h1>PENA MANTAP - Penilaian Keaktifan Bintang</h1>
+                <p>Fitur Multi-Klik Maksi 5 Bintang Berwarna • 25 Kolom Pertemuan Angka (1-25)</p>
+            </div>
+        </div>
+        <div class="button-group">
+            <!-- INPUT PILIHAN POIN POKOK -->
+            <select id="pilihPoin" class="select-poin">
+                <!-- Opsi diisi otomatis via JS dari 1 sampai 25 -->
+            </select>
+            
+            <!-- TOMBOL MANIPULASI MASSAL BERDASARKAN POIN -->
+            <button class="btn btn-success" onclick="tambahBintangMassal()"><i class="fa-solid fa-star"></i> Tambah 1 Bintang</button>
+            <button class="btn btn-warning" onclick="kurangBintangMassal()"><i class="fa-solid fa-star-half-stroke"></i> Hapus 1 Bintang</button>
+            
+            <!-- TOMBOL HAPUS TOTAL DENGAN PASSWORD -->
+            <button class="btn btn-danger" onclick="hapusSemuaBintang()"><i class="fa-solid fa-trash-can"></i> Hapus Semua Bintang</button>
+
+            <!-- MENU PELANGGARAN TERBARU -->
+            <a href="Pelanggaran.html" class="btn btn-pelanggaran"><i class="fa-solid fa-triangle-exclamation"></i> PELANGGARAN</a>
+            
+            <button class="btn btn-pdf" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Cetak Laporan (A4)</button>
+            <button class="btn btn-save" onclick="simpanKeSheets(this)"><i class="fa-solid fa-cloud-arrow-up"></i> Simpan ke Sheets</button>
+            <button class="btn btn-back" onclick="window.location.href='PENA MANTAP.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr id="headerRow"></tr>
+            </thead>
+            <tbody id="bodyBintang"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyVPGeThlYpyT_WwsuJZSY25mtlbc1Sygwj8e9SHPCHjftSJ1jsYWCzbXs9vcQAy_en/exec";
+
+    let SISWA = JSON.parse(localStorage.getItem('dbMasterSiswa')) || [
+        ["3052","Amelia Alita Zahra"],["3223","Angelica Vikar Maharani"],["3085","Anggraeni Abbilah Dhety"],
+        ["3087","AZKA NAILUN NABHAN"],["3088","Cinta Anugrah"],["3089","Dany Sabiq El-Fathin"],
+        ["3090","Dhea Fiky Mazaya"],["3224","Earlita Arsyifa Salsabila"],["3091","Fadilla Rizqi Khaerani"],
+        ["3092","Fathan Almaizan Zhafar"],["3093","Gavin Harry Wiriawan"],["3063","Hafiz Ardiyansah"],
+        ["3095","Intan Berliyan"],["3096","Luthfiya Nur Ramadhani"],["3069","M. Miftah Al Fattah"],
+        ["3097","Mugi Aditia Ripki"],["3098","Muh Azzka Alpratama"],["3099","Muhamad Ramadhani"],
+        ["3102","Nayla Dwi Syafriani"],["3108","Puteri Ayuning Kirana"],["3103","Raisa Rahmawati Septiani"],
+        ["3104","Renita Nur Saefitri"],["3084","Shalwa Aisa Nazwa"],["3105","Wifha Alya An Adibah"],
+        ["3106","Zhidan Dwi Aprilio Nurosy"],["3107","Zulfan Azhar Ramadhan"]
+    ];
+
+    let databaseBintang = JSON.parse(localStorage.getItem('dbBintangLevel')) || {};
+
+    function prosesUnggahLogo(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('tampilanLogo').src = e.target.result;
+                localStorage.setItem('dbLogoBintang', e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function muatLogo() {
+        const logo = localStorage.getItem('dbLogoBintang');
+        if (logo) document.getElementById('tampilanLogo').src = logo;
+    }
+
+    function inisialisasiTabel() {
+        const header = document.getElementById('headerRow');
+        let headerHtml = `
+            <th class="th-utama" style="width: 45px;">No</th>
+            <th class="th-utama col-nama">Nama Siswa</th>
+        `;
+        
+        for (let i = 1; i <= 25; i++) {
+            headerHtml += `<th class="th-bintang">${i}</th>`;
+        }
+        headerHtml += `<th class="th-total">Total</th>`;
+        header.innerHTML = headerHtml;
+
+        const body = document.getElementById('bodyBintang');
+        body.innerHTML = '';
+
+        SISWA.forEach((siswa, index) => {
+            const nis = siswa[0];
+            const nama = siswa[1];
+            
+            if (!databaseBintang[nis]) {
+                databaseBintang[nis] = Array(25).fill(0);
+            }
+            const arrBintang = databaseBintang[nis];
+
+            let rowHtml = `
+                <tr data-nis="${nis}">
+                    <td class="col-no">${index + 1}</td>
+                    <td class="col-nama" title="${nama}">${nama}</td>
+            `;
+
+            for (let i = 0; i < 25; i++) {
+                const levelClick = arrBintang[i] || 0;
+                let classLvl = levelClick > 0 ? `lvl-${levelClick}` : '';
+                let iconStar = levelClick > 0 ? 'fa-solid fa-star' : 'fa-regular fa-star';
+                let teksAngka = levelClick > 0 ? `<span class="star-num">${levelClick}</span>` : '';
+                
+                rowHtml += `
+                    <td>
+                        <div class="star-box ${classLvl}" data-index="${i}" onclick="handleKlikBintang(this)">
+                            <i class="${iconStar}"></i>
+                            ${teksAngka}
+                        </div>
+                    </td>
+                `;
+            }
+
+            const totalSiswa = arrBintang.reduce((a, b) => a + b, 0);
+            rowHtml += `
+                    <td><b class="total-bintang">${totalSiswa}</b></td>
+                </tr>
+            `;
+            body.innerHTML += rowHtml;
+        });
+    }
+
+    function handleKlikBintang(element) {
+        const row = element.closest('tr');
+        const nis = row.getAttribute('data-nis');
+        const colIdx = parseInt(element.getAttribute('data-index'));
+
+        let levelSekarang = databaseBintang[nis][colIdx] || 0;
+        
+        levelSekarang++;
+        if (levelSekarang > 5) levelSekarang = 0;
+
+        databaseBintang[nis][colIdx] = levelSekarang;
+        localStorage.setItem('dbBintangLevel', JSON.stringify(databaseBintang));
+
+        element.className = "star-box"; 
+        if (levelSekarang > 0) {
+            element.classList.add(`lvl-${levelSekarang}`);
+            element.innerHTML = `<i class="fa-solid fa-star"></i><span class="star-num">${levelSekarang}</span>`;
+        } else {
+            element.innerHTML = `<i class="fa-regular fa-star"></i>`;
+        }
+
+        const totalBaris = databaseBintang[nis].reduce((a, b) => a + b, 0);
+        row.querySelector('.total-bintang').innerText = totalBaris;
+    }
+
+    function hapusSemuaBintang() {
+        const password = prompt("Masukkan password untuk menghapus seluruh data bintang:");
+        
+        if (password === null) return;
+        
+        if (password === "ikhwan22") {
+            if (confirm("Apakah Anda benar-benar yakin ingin menghapus SEMUA bintang seluruh siswa?")) {
+                databaseBintang = {};
+                localStorage.setItem('dbBintangLevel', JSON.stringify(databaseBintang));
+                inisialisasiTabel();
+                alert("Seluruh data bintang berhasil dibersihkan!");
+            }
+        } else {
+            alert("Password salah! Data gagal dihapus.");
+        }
+    }
+
+    function tambahBintangMassal() {
+        const selectPoin = document.getElementById('pilihPoin');
+        const poinTerpilih = parseInt(selectPoin.value);
+        const indexKolom = poinTerpilih - 1;
+
+        if (confirm(`Apakah Anda ingin menambahkan 1 bintang ke semua siswa pada Poin Pertemuan ke-${poinTerpilih}?`)) {
+            SISWA.forEach(siswa => {
+                const nis = siswa[0];
+                if (!databaseBintang[nis]) databaseBintang[nis] = Array(25).fill(0);
+                
+                let levelSekarang = databaseBintang[nis][indexKolom] || 0;
+                levelSekarang++;
+                if (levelSekarang > 5) levelSekarang = 5;
+
+                databaseBintang[nis][indexKolom] = levelSekarang;
+            });
+
+            localStorage.setItem('dbBintangLevel', JSON.stringify(databaseBintang));
+            inisialisasiTabel();
+            alert(`Berhasil menambahkan 1 bintang untuk seluruh siswa pada Poin ${poinTerpilih}!`);
+        }
+    }
+
+    function kurangBintangMassal() {
+        const selectPoin = document.getElementById('pilihPoin');
+        const poinTerpilih = parseInt(selectPoin.value);
+        const indexKolom = poinTerpilih - 1;
+
+        if (confirm(`Apakah Anda ingin mengurangi/menghapus 1 tingkatan bintang semua siswa pada Poin Pertemuan ke-${poinTerpilih}?`)) {
+            SISWA.forEach(siswa => {
+                const nis = siswa[0];
+                if (!databaseBintang[nis]) databaseBintang[nis] = Array(25).fill(0);
+                
+                let levelSekarang = databaseBintang[nis][indexKolom] || 0;
+                levelSekarang--;
+                if (levelSekarang < 0) levelSekarang = 0;
+
+                databaseBintang[nis][indexKolom] = levelSekarang;
+            });
+
+            localStorage.setItem('dbBintangLevel', JSON.stringify(databaseBintang));
+            inisialisasiTabel();
+            alert(`Berhasil mengurangi 1 bintang untuk seluruh siswa pada Poin ${poinTerpilih}!`);
+        }
+    }
+
+    function isiOpsiPoin() {
+        const selectPoin = document.getElementById('pilihPoin');
+        selectPoin.innerHTML = '';
+        for (let i = 1; i <= 25; i++) {
+            selectPoin.innerHTML += `<option value="${i}">Poin ${i}</option>`;
+        }
+    }
+
+    async function simpanKeSheets(btn) {
+        const dataPaket = [];
+        document.querySelectorAll('#bodyBintang tr').forEach(row => {
+            const nis = row.getAttribute('data-nis');
+            const nama = row.querySelector('.col-nama').innerText;
+            const total = row.querySelector('.total-bintang').innerText;
+            dataPaket.push([nis, nama, parseInt(total) || 0]);
+        });
+
+        if(!confirm("Kirim & Perbarui data total akumulasi bintang ini ke Google Sheets (Sheet: Data_Bintang_Utama)?")) return;
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Memperbarui Sheets...";
+        btn.disabled = true;
+
+        const payload = {
+            action: "UPDATE_BINTANG",
+            tanggal: new Date().toLocaleDateString('id-ID'),
+            data: dataPaket
+        };
+
+        try {
+            const response = await fetch(URL_APPS_SCRIPT, { 
+                method: "POST", 
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(payload) 
+            });
+            
+            const result = await response.json();
+            if (result.status === "SUCCESS") {
+                alert("🎉 Sukses! Data akumulasi bintang berhasil masuk dan memperbarui spreadsheet Anda!");
+            } else {
+                alert("Selesai diproses! Silakan cek kembali kolom 'Total Bintang' di spreadsheet.");
+            }
+        } catch (error) {
+            console.error("Sinkronisasi error: ", error);
+            alert("Proses pengiriman selesai! Silakan muat ulang spreadsheet Anda untuk melihat perubahan.");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    window.onload = function() {
+        muatLogo();
+        isiOpsiPoin();
+        inisialisasiTabel();
+    };
+</script>
+</body>
+</html>
