@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Data Siswa Kelas VI - Perbaikan Warna Header</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #f0faf7 0%, #e0f2fe 50%, #e0e7ff 100%); 
+            padding: 30px 20px; 
+            min-height: 100vh; 
+            color: #334155; 
+        }
+
+        .container { 
+            max-width: 1750px; 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(148, 163, 184, 0.15); 
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        
+        /* HEADER SECTION */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid #e2e8f0; 
+            padding-bottom: 25px; 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+        .header-title { display: flex; align-items: center; gap: 18px; }
+        .header-title .icon-bg {
+            background: linear-gradient(135deg, #0d9488, #0ea5e9);
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 8px 16px rgba(13, 148, 136, 0.2);
+        }
+        .header-title h1 { font-size: 24px; color: #0f172a; font-weight: 700; letter-spacing: -0.5px; }
+        .header-title p { font-size: 14px; color: #64748b; margin-top: 2px; }
+        
+        /* CONTROLS PANEL & BUTTONS */
+        .controls-panel { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        
+        .select-semester { 
+            padding: 11px 16px; 
+            border-radius: 12px; 
+            border: 1px solid #cbd5e1; 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: #334155; 
+            outline: none; 
+            cursor: pointer; 
+            background: #fff;
+            transition: all 0.2s;
+        }
+        .select-semester:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15); }
+        
+        .btn { 
+            padding: 11px 18px; 
+            border: none; 
+            border-radius: 12px; 
+            color: #fff; 
+            font-weight: 600; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            font-size: 13px; 
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-app-save { background: #3b82f6; } 
+        .btn-app-save:hover { background: #2563eb; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25); }
+
+        .btn-back { background: #64748b; }
+        .btn-back:hover { background: #475569; box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2); }
+        
+        .btn-excel { background: #16a34a; }
+        .btn-excel:hover { background: #15803d; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); }
+
+        .btn-import { background: #ea580c; }
+        .btn-import:hover { background: #c2410c; box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25); }
+
+        .btn-template { background: #0284c7; }
+        .btn-template:hover { background: #0369a1; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); }
+
+        .btn-format-date { background: #0891b2; }
+        .btn-format-date:hover { background: #0e7490; box-shadow: 0 4px 12px rgba(8, 145, 178, 0.25); }
+
+        /* TABLE WRAPPER FOR SCROLLING */
+        .table-wrap { 
+            overflow-x: auto; 
+            background: #fff; 
+            border-radius: 16px; 
+            border: 1px solid #e2e8f0; 
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        
+        /* Mengunci semua warna background th standar menjadi biru tua */
+        th { 
+            background-color: #1e3a8a !important; 
+            color: #fff !important; 
+            font-weight: 600; 
+            padding: 14px 10px; 
+            white-space: nowrap; 
+            text-align: center; 
+            font-size: 13px; 
+        }
+        
+        td { padding: 8px 6px; border-bottom: 1px solid #f1f5f9; text-align: center; background: #fff; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        
+        .col-no { font-weight: 600; color: #64748b; width: 45px; }
+        
+        /* Sticky Column Nama Siswa - KUNCI WARNA BIRU TUA UNTUK KEPALA TABEL (TH) */
+        th.col-nama { 
+            background-color: #1e3a8a !important; 
+            color: #fff !important;
+            z-index: 3;
+        }
+
+        .col-nama { 
+            text-align: left; 
+            min-width: 220px; 
+            position: sticky; 
+            left: 0; 
+            z-index: 2; 
+            box-shadow: 3px 0 6px rgba(0,0,0,0.03); 
+            border-right: 1px solid #e2e8f0;
+        }
+
+        /* Latar belakang baris isi tabel agar selaras saat digeser */
+        tr:nth-child(odd) td.col-nama { background-color: #fff !important; }
+        tr:nth-child(even) td.col-nama { background-color: #f8fafc !important; }
+        tr:hover td { background: #f0fdfa !important; } 
+        tr:hover td.col-nama { background: #f0fdfa !important; }
+
+        /* INPUT STYLE UNIVERSAL */
+        .input-data { 
+            width: 100%; 
+            padding: 8px 12px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            text-align: center; 
+            font-size: 12px; 
+            font-weight: 500; 
+            outline: none; 
+            background: #fff !important; 
+            transition: all 0.15s ease; 
+            color: #334155;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .input-data:focus { border-color: #0d9488; background: #fff; box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15); }
+        .input-text { text-align: left; min-width: 130px; }
+        .input-angka { width: 65px; }
+        select.input-data { cursor: pointer; text-align-last: center; padding-right: 5px; }
+
+        .field-jk { min-width: 120px; }
+
+        /* Penyelarasan Khusus Kolom Dinamis NIS dan Nama Siswa */
+        .input-nis-siswa { font-weight: 600; color: #475569; width: 85px; }
+        .input-nama-siswa { font-weight: 600; color: #1e293b; text-align: left; }
+
+        /* Sembunyikan Panah Spinner Input Number */
+        .input-data::-webkit-outer-spin-button, .input-data::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .input-data[type=number] { -moz-appearance: textfield; }
+
+        .table-wrap::-webkit-scrollbar { height: 10px; }
+        .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #f1f5f9; }
+        .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        #fileImport { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-title">
+            <div class="icon-bg"><i class="fa-solid fa-address-book"></i></div>
+            <div>
+                <h1>Data Siswa - Kelas VI</h1>
+                <p>Manajemen Profil, Identitas, TTL, Fisik & Orang Tua Kandung</p>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <select id="semesterSelect" class="select-semester" onchange="gantiSemester()">
+                <option value="Semester 1">Semester 1</option>
+                <option value="Semester 2">Semester 2</option>
+            </select>
+            
+            <button class="btn btn-format-date" onclick="rapihkanSemuaTanggal()"><i class="fa-solid fa-wand-magic-sparkles"></i> Rapikan Tanggal Lahir</button>
+            <button class="btn btn-template" onclick="unduhFormat()"><i class="fa-solid fa-file-arrow-down"></i> Format Excel</button>
+            <button class="btn btn-import" onclick="picuImport()"><i class="fa-solid fa-file-import"></i> Import Excel</button>
+            <input type="file" id="fileImport" accept=".xlsx, .xls" onchange="prosesImportExcel(event)">
+
+            <button class="btn btn-excel" onclick="eksporExcel()"><i class="fa-solid fa-file-excel"></i> Unduh Excel</button>
+            <button class="btn btn-app-save" onclick="simpanKeAplikasi()"><i class="fa-solid fa-floppy-disk"></i> Simpan Aplikasi</button>
+            <button class="btn btn-back" onclick="kembaliKeAbsensi()"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table id="tabelDataSiswa">
+            <thead>
+                <tr id="headerRow"></tr>
+            </thead>
+            <tbody id="bodyDataSiswa"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const MASTER_SISWA_DEFAULT = [
+        ["3052","Amelia Alita Zahra"],["3223","Angelica Vikar Maharani"],["3085","Anggraeni Abbilah Dhety"],
+        ["3087","AZKA NAILUN NABHAN"],["3089","Dany Sabiq El-Fathin"],
+        ["3090","Dhea Fiky Mazaya"],["3224","Earlita Arsyifa Salsabila"],["3091","Fadilla Rizqi Khaerani"],
+        ["3092","Fathan Almaizan Zhafar"],["3093","Gavin Harry Wiriawan"],["3063","Hafiz Ardiyansah"],
+        ["3095","Intan Berliyan"],["3096","Luthfiya Nur Ramadhani"],["3069","M. Miftah Al Fattah"],
+        ["3097","Mugi Aditia Ripki"],["3098","Muh Azzka Alpratama"],["3099","Muhamad Ramadhani"],
+        ["3102","Nayla Dwi Syafriani"],["3108","Puteri Ayuning Kirana"],["3103","Raisa Rahmawati Septiani"],
+        ["3104","Renita Nur Saefitri"],["3084","Shalwa Aisa Nazwa"],["3105","Wifha Alya An Adibah"],
+        ["3106","Zhidan Dwi Aprilio Nurosy"],["3107","Zulfan Azhar Ramadhan"]
+    ];
+
+    let daftarSiswaKoleksi = JSON.parse(localStorage.getItem('dbMasterSiswa')) || MASTER_SISWA_DEFAULT;
+    let databaseSiswa = JSON.parse(localStorage.getItem('dbDataSiswa')) || {};
+
+    const BULAN_INDO = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    // FUNGSI UTAMA FORMAT TANGGAL KE "DD Mmmm YYYY"
+    function formatTanggalIndonesia(inputStr) {
+        if (!inputStr) return '';
+        let str = String(inputStr).trim();
+        if (!str) return '';
+
+        // Kasus jika pengguna hanya menginput tanggal saja, contoh: "1" -> "01 Januari 2014"
+        if (/^\d{1,2}$/.test(str)) {
+            let d = parseInt(str, 10);
+            if (d >= 1 && d <= 31) {
+                let padD = d < 10 ? '0' + d : d;
+                return `${padD} Januari 2014`;
+            }
+        }
+
+        // Cek jika format YYYY-MM-DD atau YYYY/MM/DD
+        let matchISO = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+        if (matchISO) {
+            let thn = matchISO[1];
+            let bln = parseInt(matchISO[2], 10) - 1;
+            let tgl = parseInt(matchISO[3], 10);
+            if (bln >= 0 && bln < 12 && tgl >= 1 && tgl <= 31) {
+                let padTgl = tgl < 10 ? '0' + tgl : tgl;
+                return `${padTgl} ${BULAN_INDO[bln]} ${thn}`;
+            }
+        }
+
+        // Cek jika format DD-MM-YYYY atau DD/MM/YYYY
+        let matchUK = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+        if (matchUK) {
+            let tgl = parseInt(matchUK[1], 10);
+            let bln = parseInt(matchUK[2], 10) - 1;
+            let thn = matchUK[3];
+            if (bln >= 0 && bln < 12 && tgl >= 1 && tgl <= 31) {
+                let padTgl = tgl < 10 ? '0' + tgl : tgl;
+                return `${padTgl} ${BULAN_INDO[bln]} ${thn}`;
+            }
+        }
+
+        // Percobaan konversi via Date standar JavaScript
+        let dObj = new Date(str);
+        if (!isNaN(dObj.getTime())) {
+            let tgl = dObj.getDate();
+            let padTgl = tgl < 10 ? '0' + tgl : tgl;
+            let bln = BULAN_INDO[dObj.getMonth()];
+            let thn = dObj.getFullYear();
+            return `${padTgl} ${bln} ${thn}`;
+        }
+
+        // Jika tidak bisa dikonversi otomatis, kembalikan nilai asli
+        return str;
+    }
+
+    function inisialisasiTabel() {
+        const header = document.getElementById('headerRow');
+        const semAktif = document.getElementById('semesterSelect').value;
+        
+        header.innerHTML = `
+            <th>No</th>
+            <th>NIS</th>
+            <th>NISN</th>
+            <th class="col-nama">Nama Siswa</th>
+            <th>Jenis Kelamin</th>
+            <th>Tempat Lahir</th>
+            <th>Tanggal Lahir</th>
+            <th>Nama Ayah</th>
+            <th>Nama Ibu</th>
+            <th>Pekerjaan Ayah</th>
+            <th>Pekerjaan Ibu</th>
+            <th>TB (cm)</th>
+            <th>BB (kg)</th>
+            <th>No WA</th>
+        `;
+
+        const body = document.getElementById('bodyDataSiswa');
+        body.innerHTML = '';
+
+        if(!databaseSiswa[semAktif]) { databaseSiswa[semAktif] = {}; }
+
+        daftarSiswaKoleksi.forEach((siswa, index) => {
+            const nis = siswa[0];
+            const nama = siswa[1];
+            
+            const dataProfil = databaseSiswa[semAktif][nis] || { 
+                nisn: '', jk: '', tempatLahir: '', tglLahir: '', namaAyah: '', namaIbu: '', 
+                kerjaAyah: '', kerjaIbu: '', tb: '', bb: '', wa: '' 
+            };
+
+            body.innerHTML += `
+                <tr data-id-index="${index}">
+                    <td class="col-no">${index + 1}</td>
+                    <td><input type="number" class="input-data input-nis-siswa field-nis" value="${nis}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="number" class="input-data field-nisn" style="min-width:110px;" value="${dataProfil.nisn || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td class="col-nama">
+                        <input type="text" class="input-data input-nama-siswa field-nama" value="${nama}" oninput="simpanDataOtomatis(this)">
+                    </td>
+                    <td>
+                        <select class="input-data field-jk" onchange="simpanDataOtomatis(this)">
+                            <option value="">- Pilih -</option>
+                            <option value="Laki-laki" ${dataProfil.jk === 'Laki-laki' || dataProfil.jk === 'L' ? 'selected' : ''}>Laki-laki</option>
+                            <option value="Perempuan" ${dataProfil.jk === 'Perempuan' || dataProfil.jk === 'P' ? 'selected' : ''}>Perempuan</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="input-data input-text field-tempatLahir" value="${dataProfil.tempatLahir || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="text" class="input-data input-text field-tglLahir" value="${dataProfil.tglLahir || ''}" oninput="simpanDataOtomatis(this)" onblur="autoFormatInputTanggal(this)" placeholder="Contoh: 01 Januari 2014"></td>
+                    <td><input type="text" class="input-data input-text field-namaAyah" value="${dataProfil.namaAyah || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="text" class="input-data input-text field-namaIbu" value="${dataProfil.namaIbu || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="text" class="input-data input-text field-kerjaAyah" value="${dataProfil.kerjaAyah || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="text" class="input-data input-text field-kerjaIbu" value="${dataProfil.kerjaIbu || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="number" class="input-data input-angka field-tb" value="${dataProfil.tb || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="number" class="input-data input-angka field-bb" value="${dataProfil.bb || ''}" oninput="simpanDataOtomatis(this)"></td>
+                    <td><input type="text" class="input-data input-text field-wa" value="${dataProfil.wa || ''}" oninput="simpanDataOtomatis(this)"></td>
+                </tr>
+            `;
+        });
+    }
+
+    function autoFormatInputTanggal(element) {
+        if (!element.value.trim()) return;
+        const hasilFormatted = formatTanggalIndonesia(element.value);
+        element.value = hasilFormatted;
+        simpanDataOtomatis(element);
+    }
+
+    function rapihkanSemuaTanggal() {
+        let count = 0;
+        document.querySelectorAll('#bodyDataSiswa tr').forEach(baris => {
+            const elTgl = baris.querySelector('.field-tglLahir');
+            if (elTgl && elTgl.value.trim()) {
+                const hasilLama = elTgl.value;
+                const hasilBaru = formatTanggalIndonesia(hasilLama);
+                if (hasilLama !== hasilBaru) {
+                    elTgl.value = hasilBaru;
+                    simpanDataOtomatis(elTgl);
+                    count++;
+                }
+            }
+        });
+        alert(`Selesai! Sebanyak ${count} tanggal lahir berhasil dirapikan otomatis ke format standar.`);
+    }
+
+    function simpanDataOtomatis(element) {
+        const baris = element.closest('tr');
+        const nis = baris.querySelector('.field-nis').value;
+        const semAktif = document.getElementById('semesterSelect').value;
+        
+        if (!nis) return;
+        
+        if (!databaseSiswa[semAktif]) { databaseSiswa[semAktif] = {}; }
+        
+        databaseSiswa[semAktif][nis] = {
+            nisn: baris.querySelector('.field-nisn').value,
+            jk: baris.querySelector('.field-jk').value,
+            tempatLahir: baris.querySelector('.field-tempatLahir').value,
+            tglLahir: baris.querySelector('.field-tglLahir').value,
+            namaAyah: baris.querySelector('.field-namaAyah').value,
+            namaIbu: baris.querySelector('.field-namaIbu').value,
+            kerjaAyah: baris.querySelector('.field-kerjaAyah').value,
+            kerjaIbu: baris.querySelector('.field-kerjaIbu').value,
+            tb: baris.querySelector('.field-tb').value,
+            bb: baris.querySelector('.field-bb').value,
+            wa: baris.querySelector('.field-wa').value
+        };
+        
+        localStorage.setItem('dbDataSiswa', JSON.stringify(databaseSiswa));
+    }
+
+    function simpanKeAplikasi() {
+        const masterBaru = [];
+        document.querySelectorAll('#bodyDataSiswa tr').forEach(baris => {
+            const nis = baris.querySelector('.field-nis').value;
+            const nama = baris.querySelector('.field-nama').value;
+            if (nis) {
+                masterBaru.push([nis, nama]);
+            }
+        });
+
+        daftarSiswaKoleksi = masterBaru;
+        localStorage.setItem('dbMasterSiswa', JSON.stringify(daftarSiswaKoleksi));
+        alert("Sukses! Perubahan NIS dan Nama Siswa berhasil dikunci & disimpan ke aplikasi lokal.");
+    }
+
+    function gantiSemester() {
+        inisialisasiTabel();
+    }
+
+    function kembaliKeAbsensi() {
+        window.location.href = 'PENA MANTAP.html'; 
+    }
+
+    function unduhFormat() {
+        const semAktif = document.getElementById('semesterSelect').value;
+        const dataTemplate = daftarSiswaKoleksi.map((siswa, idx) => ({
+            "No": idx + 1,
+            "NIS": siswa[0],
+            "NISN": "",
+            "Nama Siswa": siswa[1],
+            "Jenis Kelamin": "",
+            "Tempat Lahir": "",
+            "Tanggal Lahir": "",
+            "Nama Ayah": "",
+            "Nama Ibu": "",
+            "Pekerjaan Ayah": "",
+            "Pekerjaan Ibu": "",
+            "TB (cm)": "",
+            "BB (kg)": "",
+            "No WA": ""
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(dataTemplate);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "FormatDataSiswa");
+        XLSX.writeFile(workbook, `Format_Data_Siswa_Kelas6_${semAktif.replace(' ', '')}.xlsx`);
+    }
+
+    function picuImport() {
+        document.getElementById('fileImport').click();
+    }
+
+    function prosesImportExcel(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const dataJson = XLSX.utils.sheet_to_json(worksheet, { raw: false });
+
+            const semAktif = document.getElementById('semesterSelect').value;
+            
+            let jumlahTerisi = 0;
+            const masterBaruDariExcel = [];
+
+            dataJson.forEach(row => {
+                const nis = String(row["NIS"] || '').trim();
+                const namaSiswaExcel = row["Nama Siswa"] || '';
+                
+                let jkExcel = row["Jenis Kelamin"] || row["JK (L/P)"] || row["JK"] || '';
+                if(String(jkExcel).trim().toUpperCase() === 'L') jkExcel = 'Laki-laki';
+                if(String(jkExcel).trim().toUpperCase() === 'P') jkExcel = 'Perempuan';
+
+                let rawTglLahir = row["Tanggal Lahir"] || row["Tgl Lahir"] || '';
+                let formattedTglLahir = formatTanggalIndonesia(rawTglLahir);
+
+                if (nis) {
+                    if (!databaseSiswa[semAktif]) { databaseSiswa[semAktif] = {}; }
+                    
+                    databaseSiswa[semAktif][nis] = {
+                        nisn: row["NISN"] || '',
+                        jk: jkExcel,
+                        tempatLahir: row["Tempat Lahir"] || '',
+                        tglLahir: formattedTglLahir,
+                        namaAyah: row["Nama Ayah"] || '',
+                        namaIbu: row["Nama Ibu"] || '',
+                        kerjaAyah: row["Pekerjaan Ayah"] || '',
+                        kerjaIbu: row["Pekerjaan Ibu"] || '',
+                        tb: row["TB (cm)"] || '',
+                        bb: row["BB (kg)"] || '',
+                        wa: row["No WA"] || ''
+                    };
+                    masterBaruDariExcel.push([nis, namaSiswaExcel]);
+                    jumlahTerisi++;
+                }
+            });
+
+            if(masterBaruDariExcel.length > 0) {
+                daftarSiswaKoleksi = masterBaruDariExcel;
+                localStorage.setItem('dbMasterSiswa', JSON.stringify(daftarSiswaKoleksi));
+            }
+
+            localStorage.setItem('dbDataSiswa', JSON.stringify(databaseSiswa));
+            inisialisasiTabel();
+            alert(`Berhasil mengimpor ${jumlahTerisi} data & merapikan format tanggal lahir dari Excel!`);
+            document.getElementById('fileImport').value = ''; 
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function eksporExcel() {
+        const semAktif = document.getElementById('semesterSelect').value;
+        const workbook = XLSX.utils.table_to_book(document.getElementById('tabelDataSiswa'), { raw: true });
+        XLSX.writeFile(workbook, `Data_Siswa_Kelas6_${semAktif.replace(' ', '')}.xlsx`);
+    }
+
+    window.onload = inisialisasiTabel;
+</script>
+</body>
+</html>
