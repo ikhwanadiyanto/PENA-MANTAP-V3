@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumah Data - Manajemen Kartu Ujian</title>
+    <style>
+        /* =========================================
+           PALET WARNA SOFT GOOD MOOD (PASTEL)
+           ========================================= */
+        :root {
+            --bg-body: #f8fafc;
+            --text-main: #475569;
+            
+            /* Theme Menu 1: Soft Lavender */
+            --bg-card-1: #f3f0ff;
+            --border-card-1: #c084fc;
+            --text-card-1: #6b21a8;
+            --btn-card-1: #a855f7;
+            --btn-card-1-hover: #9333ea;
+
+            /* Theme Menu 2: Soft Sage Green */
+            --bg-card-2: #f0fdf4;
+            --border-card-2: #86efac;
+            --text-card-2: #166534;
+            --btn-card-2: #4ade80;
+            --btn-card-2-hover: #22c55e;
+
+            /* Theme Menu 3: Soft Powder Blue */
+            --bg-card-3: #f0f9ff;
+            --border-card-3: #7dd3fc;
+            --text-card-3: #0369a1;
+            --btn-card-3: #38bdf8;
+            --btn-card-3-hover: #0284c7;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
+        }
+        .admin-container { max-width: 1300px; margin: 0 auto; }
+        
+        header {
+            background: linear-gradient(135deg, #a7f3d0 0%, #bbf7d0 100%);
+            color: #065f46;
+            padding: 22px 25px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(167, 243, 208, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.3px; }
+        header p { margin: 6px 0 0 0; opacity: 0.9; font-size: 13.5px; font-weight: 400; }
+        
+        .btn-kembali {
+            background: #ffffff;
+            color: #065f46;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13.5px;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-kembali:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* STYLES BUBBLE CARD SOFT MOOD */
+        .card-menu-1 {
+            background-color: var(--bg-card-1);
+            border: 2px solid var(--border-card-1);
+        }
+        .card-menu-1 h3 { color: var(--text-card-1); }
+
+        .card-menu-2 {
+            background-color: var(--bg-card-2);
+            border: 2px solid var(--border-card-2);
+        }
+        .card-menu-2 h3 { color: var(--text-card-2); }
+
+        .card-menu-3 {
+            background-color: var(--bg-card-3);
+            border: 2px solid var(--border-card-3);
+        }
+        .card-menu-3 h3 { color: var(--text-card-3); }
+
+        .card-header-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header-toggle h3 { 
+            margin: 0; 
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-toggle-eye {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 9px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .btn-toggle-eye:hover { 
+            background: #ffffff; 
+            transform: scale(1.05);
+        }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 12.5px; color: #64748b; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 13px;
+            color: #334155;
+            background-color: #ffffff;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
+        }
+        
+        /* Baris Jam Sesi Global */
+        .jam-sesi-box {
+            background: #ffffff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-card-2);
+            margin-bottom: 14px;
+        }
+        .jam-sesi-row {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .jam-sesi-row:last-child { margin-bottom: 0; }
+        .jam-sesi-row label { font-size: 12px; font-weight: 700; color: #166534; }
+        .jam-sesi-row input { padding: 6px 8px; font-size: 12px; }
+
+        /* Baris Jadwal */
+        .jadwal-row {
+            display: grid;
+            grid-template-columns: 55px 100px 1fr 1fr;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .jadwal-row label { font-size: 12px; font-weight: 600; color: #64748b; }
+        .jadwal-row input { padding: 6px 8px; font-size: 12px; }
+
+        .btn {
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .btn-menu-1 { background: var(--btn-card-1); }
+        .btn-menu-1:hover { background: var(--btn-card-1-hover); }
+
+        .btn-menu-2 { background: var(--btn-card-2); color: #065f46; }
+        .btn-menu-2:hover { background: var(--btn-card-2-hover); color: white; }
+
+        .btn-menu-3 { background: var(--btn-card-3); }
+        .btn-menu-3:hover { background: var(--btn-card-3-hover); }
+
+        .btn-secondary-soft {
+            background: #f1f5f9;
+            color: #475569;
+            margin-top: 8px;
+        }
+        .btn-secondary-soft:hover { background: #e2e8f0; }
+        
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; }
+        th { background-color: #f8fafc; color: #64748b; font-weight: 600; }
+        tr:hover { background-color: #f8fafc; }
+        
+        .action-btns { display: flex; gap: 6px; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; color: white; font-weight: 500; }
+        .btn-info { background: #94a3b8; }
+        .btn-info:hover { background: #64748b; }
+        .btn-danger { background: #f87171; }
+        .btn-danger:hover { background: #ef4444; }
+        
+        .counter { font-size: 13.5px; font-weight: 600; color: #64748b; }
+        .badge-info {
+            background-color: #ffffff; color: #0369a1; padding: 8px 12px; 
+            border-radius: 8px; font-size: 12px; font-weight: 500; display: block; margin-bottom: 12px;
+            border-left: 3.5px solid var(--border-card-3);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .preview-img-tabel { width: 40px; height: 50px; object-fit: cover; border: 1px solid #e2e8f0; border-radius: 6px; }
+        .logo-preview-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .logo-preview { max-height: 40px; max-width: 60px; object-fit: contain; border: 1px dashed #cbd5e1; padding: 2px; background: #ffffff; border-radius: 6px; }
+
+        @media (max-width: 900px) { 
+            .main-content { grid-template-columns: 1fr; } 
+        }
+        @media (max-width: 576px) {
+            header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .btn-kembali { width: 100%; justify-content: center; }
+            .jadwal-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <header>
+            <div>
+                <h1>🏠 Rumah Data Kartu Ujian Kelas VI</h1>
+                <p>Sistem Manajemen Kartu Ujian yang diselaraskan dengan Database PENA MANTAP.</p>
+            </div>
+            <a href="index.html" class="btn-kembali">⬅️ Kembali ke Menu</a>
+        </header>
+
+        <div class="main-content">
+            <div>
+                <!-- MENU 1: GENERATE & CONVERT NOMOR UJIAN -->
+                <div class="card card-menu-1">
+                    <div class="card-header-toggle">
+                        <h3>🔢 Convert & Set Nomor Ujian</h3>
+                        <button type="button" class="btn-toggle-eye" id="btnToggleConvert" onclick="toggleSection('Convert')" title="Sembunyikan/Tampilkan Menu">🙈</button>
+                    </div>
+                    
+                    <div id="bodyConvertSection">
+                        <div class="form-group">
+                            <label for="prefixNoUjian">Prefix Nomor Peserta</label>
+                            <input type="text" id="prefixNoUjian" value="06-001-" placeholder="Contoh: 06-001-">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="form-group">
+                                <label for="startNoUrut">No. Urut Awal</label>
+                                <input type="number" id="startNoUrut" value="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="suffixNoUjian">Akhiran (Suffix)</label>
+                                <input type="text" id="suffixNoUjian" value="-8" placeholder="-8">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div class="form-group">
+                                <label for="kapasitasRuang">Kapasitas/Ruang</label>
+                                <input type="number" id="kapasitasRuang" value="16" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label for="kolomRuang">Jumlah Kolom</label>
+                                <input type="number" id="kolomRuang" value="4" min="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="polaConvert">Pola Urutan Duduk</label>
+                            <select id="polaConvert">
+                                <option value="biasa">Biasa (Kiri ke Kanan)</option>
+                                <option value="letter_s">Model Letter S (Zig-Zag)</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-menu-1" onclick="convertUrutanOtomatis()">🔄 Generate Nomor & Urutan Ujian</button>
+                    </div>
+                </div>
+
+                <!-- MENU 2: PENGATURAN CETAK UMUM -->
+                <div class="card card-menu-2">
+                    <div class="card-header-toggle">
+                        <h3>⚙️ Pengaturan Cetak Umum</h3>
+                        <button type="button" class="btn-toggle-eye" id="btnTogglePengaturan" onclick="toggleSection('Pengaturan')" title="Sembunyikan/Tampilkan Menu">🙈</button>
+                    </div>
+
+                    <div id="bodyPengaturanSection">
+                        <div class="form-group">
+                            <label for="namaUjian">Nama / Jenis Ujian</label>
+                            <input type="text" id="namaUjian" placeholder="Contoh: UJIAN SEKOLAH / ASESMEN SUMATIF">
+                        </div>
+                        <div class="form-group">
+                            <label for="namaSekolah">Nama Sekolah</label>
+                            <input type="text" id="namaSekolah" placeholder="Contoh: SD NEGERI 01 BOJONG">
+                        </div>
+                        <div class="form-group">
+                            <label for="tahunPelajaran">Tahun Pelajaran</label>
+                            <input type="text" id="tahunPelajaran" placeholder="Contoh: 2026/2027">
+                        </div>
+                        <div class="form-group">
+                            <label for="namaKepsek">Nama Kepala Sekolah</label>
+                            <input type="text" id="namaKepsek" placeholder="Nama Kepala Sekolah beserta gelar">
+                        </div>
+                        <div class="form-group">
+                            <label for="nipKepsek">NIP Kepala Sekolah</label>
+                            <input type="text" id="nipKepsek" placeholder="NIP Kepala Sekolah">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="logoSekolah">Unggah Logo Sekolah</label>
+                            <input type="file" id="logoSekolah" accept="image/*" onchange="prosesLogoSekolah(this)">
+                            <div class="logo-preview-container">
+                                <img id="previewLogo" class="logo-preview" src="" alt="Pratinjau Logo" style="display:none;">
+                                <span id="txtNoLogo" style="font-size:12px; color:#888; font-style:italic;">Belum ada logo terunggah</span>
+                            </div>
+                        </div>
+
+                        <!-- INPUT OTOMATIS WAKTU/PUKUL SESI -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label style="margin-bottom: 6px; color: var(--text-card-2);">⏰ Pengaturan Pukul / Jam Sesi (Otomatis)</label>
+                            <div class="jam-sesi-box">
+                                <div class="jam-sesi-row">
+                                    <label>Sesi 1:</label>
+                                    <input type="text" id="jamSesi1" placeholder="Misal: 07.30 - 09.30">
+                                </div>
+                                <div class="jam-sesi-row">
+                                    <label>Sesi 2:</label>
+                                    <input type="text" id="jamSesi2" placeholder="Misal: 10.00 - 11.30">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- MENU JADWAL & TANGGAL KEGIATAN -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label style="margin-bottom: 8px; color: var(--text-card-2);">🕒 Jadwal & Tanggal Kegiatan</label>
+                            
+                            <div class="jadwal-row">
+                                <label>Senin</label>
+                                <input type="text" id="tglSenin" placeholder="DD/MM/YYYY" oninput="autoGenerateTanggal(this.value)">
+                                <input type="text" id="jSenin1" placeholder="Mapel 1">
+                                <input type="text" id="jSenin2" placeholder="Mapel 2">
+                            </div>
+                            <div class="jadwal-row">
+                                <label>Selasa</label>
+                                <input type="text" id="tglSelasa" placeholder="DD/MM/YYYY">
+                                <input type="text" id="jSelasa1" placeholder="Mapel 1">
+                                <input type="text" id="jSelasa2" placeholder="Mapel 2">
+                            </div>
+                            <div class="jadwal-row">
+                                <label>Rabu</label>
+                                <input type="text" id="tglRabu" placeholder="DD/MM/YYYY">
+                                <input type="text" id="jRabu1" placeholder="Mapel 1">
+                                <input type="text" id="jRabu2" placeholder="Mapel 2">
+                            </div>
+                            <div class="jadwal-row">
+                                <label>Kamis</label>
+                                <input type="text" id="tglKamis" placeholder="DD/MM/YYYY">
+                                <input type="text" id="jKamis1" placeholder="Mapel 1">
+                                <input type="text" id="jKamis2" placeholder="Mapel 2">
+                            </div>
+                            <div class="jadwal-row">
+                                <label>Jum'at</label>
+                                <input type="text" id="tglJumat" placeholder="DD/MM/YYYY">
+                                <input type="text" id="jJumat1" placeholder="Mapel 1">
+                                <input type="text" id="jJumat2" placeholder="Mapel 2">
+                            </div>
+                            <div class="jadwal-row">
+                                <label>Sabtu</label>
+                                <input type="text" id="tglSabtu" placeholder="DD/MM/YYYY">
+                                <input type="text" id="jSabtu1" placeholder="Mapel 1">
+                                <input type="text" id="jSabtu2" placeholder="Mapel 2">
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-menu-2" onclick="simpanPengaturanUmum()">💾 Simpan Pengaturan Umum</button>
+                    </div>
+                </div>
+
+                <!-- MENU 3: INPUT DATA SISWA MANUAL -->
+                <div class="card card-menu-3">
+                    <div class="card-header-toggle">
+                        <h3>👤 Input Data Siswa Manual</h3>
+                        <button type="button" class="btn-toggle-eye" id="btnToggleInputSiswa" onclick="toggleSection('InputSiswa')" title="Sembunyikan/Tampilkan Menu">🙈</button>
+                    </div>
+
+                    <div id="bodyInputSiswaSection">
+                        <span class="badge-info" id="statusPenyimpanan">Memeriksa sinkronisasi memori...</span>
+                        <form id="siswaForm">
+                            <div class="form-group">
+                                <label for="nis">NIS (Nomor Induk Siswa)</label>
+                                <input type="text" id="nis" placeholder="Contoh: 3052" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nama">Nama Lengkap</label>
+                                <input type="text" id="nama" placeholder="Nama Siswa" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="noPeserta">No. Peserta Ujian</label>
+                                <input type="text" id="noPeserta" placeholder="06-001-001-8" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ruang">Ruang Ujian</label>
+                                <input type="text" id="ruang" placeholder="Ruang 01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bangku">Nomor Bangku</label>
+                                <input type="text" id="bangku" placeholder="01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="foto">Upload Foto Siswa (Lokal)</label>
+                                <input type="file" id="foto" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-menu-3">Simpan ke Rumah Data</button>
+                            <button type="button" class="btn btn-secondary-soft" onclick="tarikDariPenaMantap()">🔄 Tarik Data & Foto dari PENA MANTAP</button>
+                            <button type="button" class="btn btn-menu-1" style="margin-top: 8px;" onclick="cetakPdfKartuUjian()">📄 Cetak / Save ke PDF</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL SISWA -->
+            <div class="card" style="border: 1.5px solid #e2e8f0; height: fit-content;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="counter" id="jumlahSiswa">Total: 0 Siswa</div>
+                    <button class="btn-sm btn-danger" style="padding: 7px 12px;" onclick="bersihkanSemua()">Kosongkan Rumah Data</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Foto</th>
+                                <th>NIS</th>
+                                <th>Nama Lengkap</th>
+                                <th>No. Peserta</th>
+                                <th>Ruang (Bangku)</th>
+                                <th style="width: 110px; text-align: center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelSiswa">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MASTER_SISWA_DEFAULT = [
+            ["3052","Amelia Alita Zahra"],["3223","Angelica Vikar Maharani"],["3085","Anggraeni Abbilah Dhety"],
+            ["3087","AZKA NAILUN NABHAN"],["3088","Cinta Anugrah"],["3090","Dhea Fiky Mazaya"],
+            ["3224","Earlita Arsyifa Salsabila"],["3091","Fadilla Rizqi Khaerani"],["3092","Fathan Almaizan Zhafar"],
+            ["3093","Gavin Harry Wiriawan"],["3063","Hafiz Ardiyansah"],["3095","Intan Berliyan"],
+            ["3096","Luthfiya Nur Ramadhani"],["3069","M. Miftah Al Fattah"],["3097","Mugi Aditia Ripki"],
+            ["3098","Muh Azzka Alpratama"],["3102","Nayla Dwi Syafriani"],["3108","Puteri Ayuning Kirana"],
+            ["3103","Raisa Rahmawati Septiani"],["3104","Renita Nur Saefitri"],["3084","Shalwa Aisa Nazwa"],
+            ["3105","Wifha Alya An Adibah"],["3106","Zhidan Dwi Aprilio Nurosy"],["3107","Zulfan Azhar Ramadhan"]
+        ];
+
+        let dbMasterSiswa = JSON.parse(localStorage.getItem('dbMasterSiswa'));
+        const statusBadge = document.getElementById('statusPenyimpanan');
+
+        if (!dbMasterSiswa || dbMasterSiswa.length === 0) {
+            dbMasterSiswa = MASTER_SISWA_DEFAULT;
+            localStorage.setItem('dbMasterSiswa', JSON.stringify(dbMasterSiswa));
+            statusBadge.innerText = "ℹ️ Menggunakan Rumusan Default";
+        } else {
+            statusBadge.innerText = "⚡ Terhubung Otomatis dengan PENA MANTAP";
+        }
+        
+        let dbKartuUjian = JSON.parse(localStorage.getItem('dbKartuUjian')) || {};
+        let dbFotoSiswa = JSON.parse(localStorage.getItem('dbFotoSiswa')) || {};
+        let logoSekolahBase64 = localStorage.getItem('logoSekolahBase64') || '';
+
+        const sectionStates = {
+            Convert: localStorage.getItem('hideConvertSection') === 'false' ? false : true,
+            Pengaturan: localStorage.getItem('hidePengaturanSection') === 'false' ? false : true,
+            InputSiswa: localStorage.getItem('hideInputSiswaSection') === 'true' ? true : false
+        };
+
+        function applyVisibility(sectionName) {
+            const bodySec = document.getElementById(`body${sectionName}Section`);
+            const btnEye = document.getElementById(`btnToggle${sectionName}`);
+            const isHidden = sectionStates[sectionName];
+
+            if (isHidden) {
+                bodySec.style.display = 'none';
+                btnEye.innerText = '🙈';
+                btnEye.title = 'Tampilkan Menu';
+            } else {
+                bodySec.style.display = 'block';
+                btnEye.innerText = '👁️';
+                btnEye.title = 'Sembunyikan Menu';
+            }
+        }
+
+        function toggleSection(sectionName) {
+            sectionStates[sectionName] = !sectionStates[sectionName];
+            localStorage.setItem(`hide${sectionName}Section`, sectionStates[sectionName]);
+            applyVisibility(sectionName);
+        }
+
+        ['Convert', 'Pengaturan', 'InputSiswa'].forEach(applyVisibility);
+
+        document.getElementById('namaUjian').value = localStorage.getItem('namaUjian') || '';
+        document.getElementById('namaSekolah').value = localStorage.getItem('namaSekolah') || '';
+        document.getElementById('tahunPelajaran').value = localStorage.getItem('tahunPelajaran') || '2026/2027';
+        document.getElementById('namaKepsek').value = localStorage.getItem('namaKepsek') || '';
+        document.getElementById('nipKepsek').value = localStorage.getItem('nipKepsek') || '';
+        document.getElementById('jamSesi1').value = localStorage.getItem('jamSesi1') || '07.30 - 09.30';
+        document.getElementById('jamSesi2').value = localStorage.getItem('jamSesi2') || '10.00 - 11.30';
+        
+        if(logoSekolahBase64) {
+            document.getElementById('previewLogo').src = logoSekolahBase64;
+            document.getElementById('previewLogo').style.display = 'block';
+            document.getElementById('txtNoLogo').style.display = 'none';
+        }
+
+        const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        hariList.forEach(hari => {
+            document.getElementById(`j${hari}1`).value = localStorage.getItem(`j${hari}1`) || '';
+            document.getElementById(`j${hari}2`).value = localStorage.getItem(`j${hari}2`) || '';
+            document.getElementById(`tgl${hari}`).value = localStorage.getItem(`tgl${hari}`) || '';
+        });
+
+        function autoGenerateTanggal(valSenin) {
+            valSenin = valSenin.trim();
+            if (!valSenin) return;
+
+            const parts = valSenin.split(/[\/\-]/);
+            if (parts.length < 2) return;
+
+            let day = parseInt(parts[0], 10);
+            let month = parseInt(parts[1], 10) - 1;
+            let year = parts[2] ? parseInt(parts[2], 10) : new Date().getFullYear();
+
+            if (year < 100) year += 2000;
+
+            let dateObj = new Date(year, month, day);
+            if (isNaN(dateObj.getTime())) return;
+
+            const targetIds = ['tglSelasa', 'tglRabu', 'tglKamis', 'tglJumat', 'tglSabtu'];
+            
+            targetIds.forEach((id, index) => {
+                let nextDate = new Date(dateObj);
+                nextDate.setDate(dateObj.getDate() + (index + 1));
+
+                let d = String(nextDate.getDate()).padStart(2, '0');
+                let m = String(nextDate.getMonth() + 1).padStart(2, '0');
+                let y = parts[2] && parts[2].length === 2 ? String(nextDate.getFullYear()).slice(-2) : nextDate.getFullYear();
+
+                document.getElementById(id).value = `${d}/${m}/${y}`;
+            });
+        }
+
+        dbMasterSiswa.forEach((siswa, i) => {
+            const nis = siswa[0];
+            if (!dbKartuUjian[nis]) {
+                dbKartuUjian[nis] = {
+                    noPeserta: `06-001-${String(i+1).padStart(3, '0')}-8`,
+                    ruang: i < 16 ? "Ruang 01" : "Ruang 02",
+                    bangku: String(i+1).padStart(2, '0')
+                };
+            }
+        });
+        localStorage.setItem('dbKartuUjian', JSON.stringify(dbKartuUjian));
+
+        const form = document.getElementById('siswaForm');
+        const tabelSiswa = document.getElementById('tabelSiswa');
+        const jumlahSiswaText = document.getElementById('jumlahSiswa');
+
+        function prosesLogoSekolah(input) {
+            const file = input.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    logoSekolahBase64 = e.target.result;
+                    document.getElementById('previewLogo').src = logoSekolahBase64;
+                    document.getElementById('previewLogo').style.display = 'block';
+                    document.getElementById('txtNoLogo').style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function simpanPengaturanUmum() {
+            localStorage.setItem('namaUjian', document.getElementById('namaUjian').value.trim());
+            localStorage.setItem('namaSekolah', document.getElementById('namaSekolah').value.trim());
+            localStorage.setItem('tahunPelajaran', document.getElementById('tahunPelajaran').value.trim());
+            localStorage.setItem('namaKepsek', document.getElementById('namaKepsek').value.trim());
+            localStorage.setItem('nipKepsek', document.getElementById('nipKepsek').value.trim());
+            localStorage.setItem('jamSesi1', document.getElementById('jamSesi1').value.trim());
+            localStorage.setItem('jamSesi2', document.getElementById('jamSesi2').value.trim());
+
+            if(logoSekolahBase64) {
+                localStorage.setItem('logoSekolahBase64', logoSekolahBase64);
+            }
+            
+            hariList.forEach(hari => {
+                localStorage.setItem(`j${hari}1`, document.getElementById(`j${hari}1`).value.trim());
+                localStorage.setItem(`j${hari}2`, document.getElementById(`j${hari}2`).value.trim());
+                localStorage.setItem(`tgl${hari}`, document.getElementById(`tgl${hari}`).value.trim());
+            });
+            
+            alert('Pengaturan umum berhasil disimpan!');
+        }
+
+        function convertUrutanOtomatis() {
+            if (dbMasterSiswa.length === 0) return alert("Tidak ada data siswa!");
+
+            const prefix = document.getElementById('prefixNoUjian').value.trim();
+            const startNo = parseInt(document.getElementById('startNoUrut').value) || 1;
+            const suffix = document.getElementById('suffixNoUjian').value.trim();
+            const maksSiswa = parseInt(document.getElementById('kapasitasRuang').value) || 16;
+            const cols = parseInt(document.getElementById('kolomRuang').value) || 4;
+            const pola = document.getElementById('polaConvert').value;
+
+            dbMasterSiswa.forEach((siswa, index) => {
+                const nis = siswa[0];
+                const rNum = Math.floor(index / maksSiswa) + 1;
+                const offsetRuang = Math.floor(index / maksSiswa) * maksSiswa;
+                const posInRoom = index % maksSiswa;
+
+                let bangkuInRoom = posInRoom;
+                if (pola === 'letter_s') {
+                    let baris = Math.floor(posInRoom / cols);
+                    let kolom = posInRoom % cols;
+                    if (baris % 2 === 1) {
+                        kolom = (cols - 1) - kolom;
+                    }
+                    bangkuInRoom = (baris * cols) + kolom;
+                }
+
+                const nomorBangkuKontinu = offsetRuang + bangkuInRoom + 1;
+                const nomorUrutPeserta = startNo + index;
+
+                dbKartuUjian[nis] = {
+                    noPeserta: `${prefix}${String(nomorUrutPeserta).padStart(3, '0')}${suffix}`,
+                    ruang: `Ruang ${String(rNum).padStart(2, '0')}`,
+                    bangku: String(nomorBangkuKontinu).padStart(2, '0')
+                };
+            });
+
+            localStorage.setItem('dbKartuUjian', JSON.stringify(dbKartuUjian));
+            renderTabel();
+            alert(`✅ Berhasil mengonversi ${dbMasterSiswa.length} siswa.`);
+        }
+
+        function renderTabel() {
+            tabelSiswa.innerHTML = '';
+            dbMasterSiswa.forEach((siswa, index) => {
+                const nisSiswa = siswa[0]; 
+                const namaSiswa = siswa[1]; 
+                const infoKartu = dbKartuUjian[nisSiswa] || { noPeserta: '-', ruang: '-', bangku: '-' };
+                const fotoSiswa = dbFotoSiswa[nisSiswa] || '';
+
+                const imgTag = fotoSiswa ? `<img src="${fotoSiswa}" class="preview-img-tabel">` : `<div style="width:40px; height:50px; background:#f8fafc; font-size:9px; display:flex; align-items:center; justify-content:center; text-align:center; border:1px dashed #cbd5e1; border-radius:6px; color:#94a3b8;">No Foto</div>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${imgTag}</td>
+                    <td><b>${nisSiswa}</b></td>
+                    <td style="text-transform: uppercase; font-weight: 600; color: #334155;">${namaSiswa}</td>
+                    <td>${infoKartu.noPeserta}</td>
+                    <td>${infoKartu.ruang} (No. ${infoKartu.bangku})</td>
+                    <td class="action-btns">
+                        <button class="btn-sm btn-info" onclick="editSiswa('${nisSiswa}', '${namaSiswa}')">Edit</button>
+                        <button class="btn-sm btn-danger" onclick="hapusSiswa(${index}, '${nisSiswa}')">Hapus</button>
+                    </td>
+                `;
+                tabelSiswa.appendChild(tr);
+            });
+            jumlahSiswaText.innerText = `Total: ${dbMasterSiswa.length} Siswa`;
+        }
+
+        function editSiswa(nis, nama) {
+            if (sectionStates['InputSiswa']) toggleSection('InputSiswa');
+
+            const info = dbKartuUjian[nis] || { noPeserta: '', ruang: '', bangku: '' };
+            document.getElementById('nis').value = nis;
+            document.getElementById('nama').value = nama;
+            document.getElementById('noPeserta').value = info.noPeserta;
+            document.getElementById('ruang').value = info.ruang;
+            document.getElementById('bangku').value = info.bangku;
+            document.getElementById('nama').focus();
+            window.scrollTo({ top: 150, behavior: 'smooth' });
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputNis = document.getElementById('nis').value.trim();
+            const inputNama = document.getElementById('nama').value.trim();
+            const inputFoto = document.getElementById('foto').files[0];
+            
+            let indeksSiswa = dbMasterSiswa.findIndex(s => s[0] === inputNis);
+            if(indeksSiswa === -1) {
+                dbMasterSiswa.push([inputNis, inputNama]);
+            } else {
+                dbMasterSiswa[indeksSiswa][1] = inputNama;
+            }
+
+            dbKartuUjian[inputNis] = {
+                noPeserta: document.getElementById('noPeserta').value.trim(),
+                ruang: document.getElementById('ruang').value.trim(),
+                bangku: document.getElementById('bangku').value.trim()
+            };
+
+            localStorage.setItem('dbMasterSiswa', JSON.stringify(dbMasterSiswa));
+            localStorage.setItem('dbKartuUjian', JSON.stringify(dbKartuUjian));
+
+            if (inputFoto) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    dbFotoSiswa[inputNis] = event.target.result;
+                    localStorage.setItem('dbFotoSiswa', JSON.stringify(dbFotoSiswa));
+                    form.reset();
+                    renderTabel();
+                };
+                reader.readAsDataURL(inputFoto);
+            } else {
+                form.reset();
+                renderTabel();
+            }
+        });
+
+        function hapusSiswa(index, nis) {
+            if(confirm(`Hapus siswa dengan NIS ${nis}?`)) {
+                dbMasterSiswa.splice(index, 1);
+                delete dbKartuUjian[nis];
+                delete dbFotoSiswa[nis];
+                localStorage.setItem('dbMasterSiswa', JSON.stringify(dbMasterSiswa));
+                localStorage.setItem('dbKartuUjian', JSON.stringify(dbKartuUjian));
+                localStorage.setItem('dbFotoSiswa', JSON.stringify(dbFotoSiswa));
+                renderTabel();
+            }
+        }
+
+        function bersihkanSemua() {
+            if(confirm('Hapus seluruh data siswa?')) {
+                dbMasterSiswa = [];
+                dbKartuUjian = {};
+                dbFotoSiswa = {};
+                localStorage.removeItem('dbMasterSiswa');
+                localStorage.removeItem('dbKartuUjian');
+                localStorage.removeItem('dbFotoSiswa');
+                renderTabel();
+            }
+        }
+
+        function tarikDariPenaMantap() {
+            const dataPena = localStorage.getItem('dbMasterSiswa');
+            const fotoPena = localStorage.getItem('dbFotoSiswa');
+            
+            if(dataPena) {
+                dbMasterSiswa = JSON.parse(dataPena);
+                localStorage.setItem('dbMasterSiswa', JSON.stringify(dbMasterSiswa));
+                if(fotoPena) {
+                    dbFotoSiswa = JSON.parse(fotoPena);
+                    localStorage.setItem('dbFotoSiswa', JSON.stringify(dbFotoSiswa));
+                }
+                renderTabel();
+                alert(`Berhasil menarik ${dbMasterSiswa.length} siswa dari PENA MANTAP.`);
+            } else {
+                alert('Sistem belum mendeteksi data baru.');
+            }
+        }
+
+        function cetakPdfKartuUjian() {
+            if (dbMasterSiswa.length === 0) return alert("Tidak ada data siswa untuk dicetak!");
+
+            const namaUjian = document.getElementById('namaUjian').value.trim() || 'KARTU PESERTA UJIAN';
+            const namaSekolah = document.getElementById('namaSekolah').value.trim();
+            const tahunPelajaran = document.getElementById('tahunPelajaran').value.trim() || '2026/2027';
+            const namaKepsek = document.getElementById('namaKepsek').value.trim() || '.........................';
+            const nipKepsek = document.getElementById('nipKepsek').value.trim() || '.........................';
+
+            const jamSesi1Val = document.getElementById('jamSesi1').value.trim() || '-';
+            const jamSesi2Val = document.getElementById('jamSesi2').value.trim() || '-';
+
+            const tglSen = document.getElementById('tglSenin').value.trim();
+            const tglSel = document.getElementById('tglSelasa').value.trim();
+            const tglRab = document.getElementById('tglRabu').value.trim();
+            const tglKam = document.getElementById('tglKamis').value.trim();
+            const tglJum = document.getElementById('tglJumat').value.trim();
+            const tglSab = document.getElementById('tglSabtu').value.trim();
+
+            const sen1 = document.getElementById('jSenin1').value.trim() || '-';
+            const sen2 = document.getElementById('jSenin2').value.trim() || '-';
+            const sel1 = document.getElementById('jSelasa1').value.trim() || '-';
+            const sel2 = document.getElementById('jSelasa2').value.trim() || '-';
+            const rab1 = document.getElementById('jRabu1').value.trim() || '-';
+            const rab2 = document.getElementById('jRabu2').value.trim() || '-';
+            const kam1 = document.getElementById('jKamis1').value.trim() || '-';
+            const kam2 = document.getElementById('jKamis2').value.trim() || '-';
+            const jum1 = document.getElementById('jJumat1').value.trim() || '-';
+            const jum2 = document.getElementById('jJumat2').value.trim() || '-';
+            const sab1 = document.getElementById('jSabtu1').value.trim() || '-';
+            const sab2 = document.getElementById('jSabtu2').value.trim() || '-';
+
+            const txtSekolahHTML = namaSekolah ? `<h4 style="font-weight:bold; margin-top:2px; font-size:11px;">${namaSekolah.toUpperCase()}</h4>` : '';
+
+            let htmlCards = "";
+            
+            dbMasterSiswa.forEach((siswa) => {
+                const nis = siswa[0];
+                const nama = siswa[1].toUpperCase();
+                const info = dbKartuUjian[nis] || { noPeserta: "-", ruang: "-", bangku: "-" };
+                const foto = dbFotoSiswa[nis] || "";
+
+                const renderFotoBox = foto ? 
+                    `<img class="foto-box" src="${foto}" style="object-fit:cover;">` : 
+                    `<div class="foto-box">Foto<br>3x4</div>`;
+
+                const renderLogoTag = logoSekolahBase64 ? 
+                    `<img src="${logoSekolahBase64}" class="logo-cetak-kartu" alt="Logo">` : '';
+                
+                const textHeaderStyle = logoSekolahBase64 ? '' : 'style="text-align: center; width: 100%; padding-left: 0;"';
+
+                htmlCards += `
+                <div class="card-box">
+                    <div class="card-header-with-logo">
+                        ${renderLogoTag}
+                        <div class="header-text-container" ${textHeaderStyle}>
+                            <h3>${namaUjian.toUpperCase()}</h3>
+                            ${txtSekolahHTML}
+                            <h4>KELAS VI (ENAM) - TA. ${tahunPelajaran}</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table style="width:100%; margin-bottom: 6px;" class="info-siswa-table">
+                            <tr>
+                                <td style="width:22%; font-weight:600;">No. Peserta</td>
+                                <td style="width:28%;">: ${info.noPeserta}</td>
+                                <td style="width:22%; font-weight:600;">Ruang/Bangku</td>
+                                <td style="width:28%;">: ${info.ruang} / ${info.bangku}</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:600;">NIS / NISN</td>
+                                <td>: ${nis}</td>
+                                <td style="font-weight:600;">Nama Peserta</td>
+                                <td style="font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">: ${nama}</td>
+                            </tr>
+                        </table>
+
+                        <table class="tabel-jadwal-mini">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25px;">Sesi</th>
+                                    <th style="width: 65px;">Waktu</th>
+                                    <th>Senin${tglSen ? `<br><span class="sub-tgl">${tglSen}</span>` : ''}</th>
+                                    <th>Selasa${tglSel ? `<br><span class="sub-tgl">${tglSel}</span>` : ''}</th>
+                                    <th>Rabu${tglRab ? `<br><span class="sub-tgl">${tglRab}</span>` : ''}</th>
+                                    <th>Kamis${tglKam ? `<br><span class="sub-tgl">${tglKam}</span>` : ''}</th>
+                                    <th>Jum'at${tglJum ? `<br><span class="sub-tgl">${tglJum}</span>` : ''}</th>
+                                    <th>Sabtu${tglSab ? `<br><span class="sub-tgl">${tglSab}</span>` : ''}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight:bold; background:#f9fafb;">I</td>
+                                    <td style="font-weight:600; background:#fff; font-size: 7.5px !important;">${jamSesi1Val}</td>
+                                    <td>${sen1}</td>
+                                    <td>${sel1}</td>
+                                    <td>${rab1}</td>
+                                    <td>${kam1}</td>
+                                    <td>${jum1}</td>
+                                    <td>${sab1}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight:bold; background:#f9fafb;">II</td>
+                                    <td style="font-weight:600; background:#fff; font-size: 7.5px !important;">${jamSesi2Val}</td>
+                                    <td>${sen2}</td>
+                                    <td>${sel2}</td>
+                                    <td>${rab2}</td>
+                                    <td>${kam2}</td>
+                                    <td>${jum2}</td>
+                                    <td>${sab2}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="card-footer">
+                            ${renderFotoBox}
+                            <div class="ttd-box">
+                                Kepala Sekolah,<br><br><br><br>
+                                <b><u>${namaKepsek}</u></b><br>
+                                NIP. ${nipKepsek}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            let templateLengkap = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Cetak_Kartu_Ujian_US</title>
+    <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* SETTING 2 GRID (2 KOLOM) */
+            gap: 10px;
+            width: 100%;
+        }
+        .card-box {
+            border: 1.5px solid #000;
+            padding: 8px 10px;
+            border-radius: 6px;
+            background: #fff;
+            page-break-inside: avoid;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .card-header-with-logo { 
+            display: flex; 
+            align-items: center; 
+            border-bottom: 1.5px solid #000; 
+            padding-bottom: 5px; 
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+        .logo-cetak-kartu { width: 40px; height: 40px; object-fit: contain; }
+        .header-text-container { flex: 1; text-align: center; }
+        .header-text-container h3 { margin: 0; font-size: 11px; font-weight: bold; line-height: 1.1; }
+        .header-text-container h4 { margin: 2px 0 0 0; font-size: 9px; font-weight: normal; }
+        
+        .info-siswa-table { font-size: 9px; border-collapse: collapse; }
+        .info-siswa-table td { padding: 2px 0; vertical-align: top; }
+
+        .tabel-jadwal-mini { width: 100%; margin-top: 5px; margin-bottom: 5px; border: 1px solid #000 !important; text-align: center; border-collapse: collapse; }
+        .tabel-jadwal-mini th, .tabel-jadwal-mini td { border: 1px solid #000; padding: 3px 1px !important; font-size: 8px !important; font-weight: normal; word-wrap: break-word; }
+        .tabel-jadwal-mini th { background: #f3f4f6; font-weight: bold; line-height: 1.1; font-size: 8.5px !important; }
+        .sub-tgl { font-size: 7px; font-weight: normal; color: #333; display: block; margin-top: 1px; }
+        
+        .card-footer { display: flex; justify-content: space-between; margin-top: 6px; align-items: flex-end; }
+        .foto-box { width: 50px; height: 65px; border: 1px solid #000; text-align: center; font-size: 8px; color: #555; display: flex; align-items: center; justify-content: center; background: #fafafa; }
+        .ttd-box { text-align: center; font-size: 8.5px; width: 140px; line-height: 1.1; }
+    </style>
+</head>
+<body>
+    <div class="grid-container">${htmlCards}</div>
+    <script>window.onload = function() { setTimeout(function() { window.print(); }, 300); };<\/script>
+</body>
+</html>`;
+
+            const blob = new Blob([templateLengkap], { type: "text/html" });
+            const urlBlob = URL.createObjectURL(blob);
+            window.open(urlBlob, '_blank');
+        }
+
+        renderTabel();
+    </script>
+</body>
+</html>
