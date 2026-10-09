@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pendataan Tabungan Kelas VI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&family=Great+Vibes&family=Cinzel:wght=600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Library QR/Barcode Scanner -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, #4f46e5, #3b82f6, #06b6d4); padding: 20px; min-height: 100vh; color: #374151; }
+        .container { max-width: 1200px; margin: auto; background: #fff; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); padding: 25px; width: 100%; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e5e7eb; padding-bottom: 20px; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .header-title h1 { font-size: 22px; color: #0f172a; }
+        .btn { padding: 10px 18px; border: none; border-radius: 12px; color: #fff; font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-scan { background: #0284c7; }
+        .btn-scan:hover { background: #0369a1; }
+        .btn-excel { background: #16a34a; }
+        .btn-import { background: #2563eb; }
+        .btn-print { background: #e11d48; white-space: nowrap; }
+        .btn-pdf { background: #f59e0b; }
+        .btn-cert { background: #8b5cf6; }
+        .btn-cert:hover { background: #7c3aed; }
+        .btn-submit { background: #4f46e5; width: 100%; padding: 12px; font-size: 15px; justify-content: center; }
+        .btn-clear-all { background: #dc2626; width: 100%; padding: 10px; font-size: 13px; justify-content: center; margin-top: 15px; opacity: 0.85; }
+        .btn-clear-all:hover { opacity: 1; background: #b91c1c; }
+        
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .card-stat { padding: 20px; border-radius: 16px; color: #fff; display: flex; align-items: center; justify-content: space-between; position: relative; }
+        .stat-setor { background: linear-gradient(135deg, #10b981, #059669); }
+        .stat-tarik { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .stat-total { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        
+        .btn-toggle-saldo { background: rgba(255,255,255,0.25); border: none; color: #fff; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-toggle-saldo:hover { background: rgba(255,255,255,0.4); transform: scale(1.08); }
+
+        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 25px; margin-bottom: 25px; }
+        @media (max-width: 992px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .panel-form { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; height: fit-content; }
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; }
+        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        
+        .input-group-tarik { display: flex; gap: 8px; align-items: center; margin-top: 5px; margin-bottom: 10px; }
+        .btn-tarik { background: #4f46e5; color: #fff; border: none; width: 42px; height: 42px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; flex-shrink: 0; }
+        .btn-tarik:hover { background: #4338ca; transform: scale(1.05); }
+
+        .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .btn-toggle-filter { background: #64748b; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .btn-toggle-filter:hover { background: #475569; }
+
+        .filter-panel { margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; transition: all 0.3s ease; }
+        .filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        
+        .table-wrap { overflow-x: auto; background: #fff; border-radius: 16px; border: 1px solid #e2e8f0; max-height: 450px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
+        th { background: #475569; color: #fff; padding: 12px; position: sticky; top: 0; }
+        td { padding: 10px; border-bottom: 1px solid #f1f5f9; text-align: center; }
+        
+        .action-cell { display: flex; gap: 8px; justify-content: center; align-items: center; }
+        .btn-edit { background: none; border: none; color: #f59e0b; cursor: pointer; font-size: 15px; }
+        .btn-edit:hover { transform: scale(1.15); }
+        .btn-delete { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 15px; }
+        .btn-delete:hover { transform: scale(1.15); }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-card { background: #fff; padding: 25px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-card h3 { margin-bottom: 15px; color: #0f172a; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+
+        #interactive-scanner { width: 100%; height: 260px; background: #000; border-radius: 12px; overflow: hidden; }
+        .modal-info-siswa { background: #f1f5f9; padding: 12px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-title" style="display: flex; align-items: center; gap: 15px;">
+            <a href="PENA MANTAP.html" class="btn" style="background: #64748b; text-decoration: none;">
+                <i class="fa-solid fa-arrow-left"></i> Kembali
+            </a>
+            <h1>Sistem Manajemen Tabungan</h1>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-scan" onclick="bukaModalScanner()"><i class="fa-solid fa-qrcode"></i> Scan Barcode</button>
+            <button class="btn btn-cert" onclick="bukaModalSertifikat()"><i class="fa-solid fa-award"></i> Sertifikat Juara</button>
+            <button class="btn btn-pdf" onclick="cetakHarianPDF()"><i class="fa-solid fa-file-pdf"></i> PDF Harian</button>
+            <input type="file" id="importFileExcel" accept=".xlsx, .xls" style="display: none;" onchange="prosesImportExcel(event)">
+            <button class="btn btn-import" onclick="document.getElementById('importFileExcel').click()"><i class="fa-solid fa-file-import"></i> Import Excel</button>
+            <button class="btn btn-excel" onclick="eksporExcel()"><i class="fa-solid fa-file-excel"></i> Unduh Excel</button>
+            <button class="btn" style="background: #0f766e;" onclick="saveKeTabungan()"><i class="fa-solid fa-cloud-arrow-up"></i> Save ke Tabungan</button>
+            <button class="btn" id="btnTarikSheet" style="background: #c2410c;" onclick="tarikDataDariSpreadsheet()"><i class="fa-solid fa-cloud-arrow-down"></i> Tarik Spreadsheet</button>
+            <button class="btn" style="background: #b45309;" onclick="saveSusulanPilihan()"><i class="fa-solid fa-business-time"></i> Save Susulan</button>
+        </div>
+    </div>
+
+    <div class="grid-stats">
+        <div class="card-stat stat-setor"><div><h3>Setoran Hari Ini</h3><p id="totalSetorHariIni">Rp 0</p></div></div>
+        <div class="card-stat stat-tarik"><div><h3>Penarikan Hari Ini</h3><p id="totalTarikHariIni">Rp 0</p></div></div>
+        <div class="card-stat stat-total">
+            <div>
+                <h3>Total Saldo</h3>
+                <p id="nettoHariIni">••••••••</p>
+            </div>
+            <button class="btn-toggle-saldo" id="btnToggleSaldo" onclick="toggleTotalSaldo()" title="Tampilkan / Sembunyikan Total Saldo">
+                <i class="fa-solid fa-eye-slash" id="iconEyeSaldo"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="panel-form">
+            <h2 id="formHeaderTitle" style="margin-bottom: 15px;">Transaksi Baru</h2>
+            <form id="formTabungan" onsubmit="tambahTransaksi(event)">
+                <input type="hidden" id="inputEditId" value="">
+
+                <label style="font-size: 13px; font-weight: 500;">Siswa</label>
+                <div class="input-group-tarik">
+                    <select id="inputSiswa" class="form-control" required></select>
+                    <button type="button" class="btn-tarik" onclick="tarikDataSiswa(true)" title="Sinkronkan Data Siswa"><i class="fa-solid fa-rotate"></i></button>
+                </div>
+                
+                <label style="font-size: 13px; font-weight: 500;">Tanggal</label>
+                <input type="date" id="inputTanggal" class="form-control" style="margin-top: 5px; margin-bottom: 10px;" required>
+                
+                <label style="font-size: 13px; font-weight: 500;">Jenis</label>
+                <select id="inputJenis" class="form-control" style="margin-top: 5px; margin-bottom: 10px;">
+                    <option value="SETOR">SETOR</option>
+                    <option value="TARIK">TARIK</option>
+                    <option value="PAJAK">PAJAK (2.5%)</option>
+                </select>
+                
+                <label style="font-size: 13px; font-weight: 500;">Pilihan Nominal</label>
+                <select id="selectNominal" class="form-control" style="margin-top: 5px; margin-bottom: 10px;" onchange="pilihNominalOtomatis()">
+                    <option value="manual">Manual</option>
+                    <option value="5000">5.000</option>
+                    <option value="10000">10.000</option>
+                    <option value="20000">20.000</option>
+                    <option value="50000">50.000</option>
+                    <option value="100000">100.000</option>
+                </select>
+
+                <label style="font-size: 13px; font-weight: 500;">Nominal (Rp)</label>
+                <input type="number" id="inputNominal" class="form-control" style="margin-top: 5px; margin-bottom: 15px;" required>
+                
+                <button type="submit" id="btnSubmitForm" class="btn btn-submit">Simpan Transaksi</button>
+                <button type="button" id="btnBatalEdit" class="btn" style="background: #64748b; width: 100%; margin-top: 8px; justify-content: center; display: none;" onclick="batalEdit()">Batal Edit</button>
+            </form>
+
+            <button class="btn btn-clear-all" onclick="hapusSemuaRiwayat()"><i class="fa-solid fa-trash-can"></i> Hapus Semua Riwayat</button>
+        </div>
+
+        <div>
+            <div class="filter-header">
+                <span style="font-size: 14px; font-weight: 600; color: #475569;">Riwayat Transaksi</span>
+                <button class="btn-toggle-filter" id="btnToggleFilter" onclick="toggleFilterPanel()" title="Sembunyikan / Tampilkan Menu Filter">
+                    <i class="fa-solid fa-eye" id="iconEyeFilter"></i> <span id="labelEyeFilter">Sembunyikan Filter</span>
+                </button>
+            </div>
+
+            <div class="filter-panel" id="filterPanel">
+                <input type="text" id="filterInput" class="form-control" placeholder="Cari NIS/Nama..." onkeyup="hitungDanTampilkan()">
+                <div class="filter-row">
+                    <select id="filterSiswa" class="form-control" onchange="hitungDanTampilkan()" style="flex: 2; min-width: 200px;">
+                        <option value="">-- Filter Per Siswa (Lihat Saldo) --</option>
+                    </select>
+                    <input type="number" id="cetakBarisMulai" class="form-control" placeholder="Mulai Baris (1, 2...)" min="1" style="flex: 1; min-width: 140px;">
+                    <input type="number" id="cetakBarisJumlah" class="form-control" placeholder="Jml Baris" min="1" style="flex: 1; min-width: 100px;">
+                    <button class="btn btn-print" onclick="cetakTabungan()"><i class="fa-solid fa-print"></i> Cetak Buku</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table id="tabelHistoriTabungan">
+                    <thead>
+                        <tr><th>Tanggal</th><th>NIS</th><th>Nama</th><th>Jenis</th><th>Nominal</th><th>Saldo</th><th>Aksi</th></tr>
+                    </thead>
+                    <tbody id="bodyLogTransaksi"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Scanner Barcode -->
+<div class="modal-overlay" id="modalScanner">
+    <div class="modal-card">
+        <h3><i class="fa-solid fa-qrcode" style="color: #0284c7;"></i> Scan Barcode Nomor Absen / NIS</h3>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Arahkan kamera ke barcode/QR Code siswa, atau masukkan Nomor Absen/NIS secara manual.</p>
+        
+        <div id="interactive-scanner"></div>
+
+        <div style="margin-top: 15px; display: flex; gap: 8px;">
+            <input type="text" id="inputScanManual" class="form-control" placeholder="Atau ketik Nomor Absen / NIS...">
+            <button class="btn btn-scan" onclick="prosesHasilScan(document.getElementById('inputScanManual').value)">Proses</button>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+            <button class="btn" style="background: #dc2626;" onclick="tutupModalScanner()"><i class="fa-solid fa-xmark"></i> Tutup (Selesai)</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Popup Transaksi Hasil Scan -->
+<div class="modal-overlay" id="modalTransaksiScan">
+    <div class="modal-card">
+        <h3><i class="fa-solid fa-wallet" style="color: #10b981;"></i> Transaksi Tabungan Siswa</h3>
+        
+        <div class="modal-info-siswa">
+            <div style="font-weight: 700; font-size: 16px; color: #0f172a;" id="modalNamaSiswa">-</div>
+            <div style="font-size: 13px; color: #64748b;">NIS: <span id="modalNisSiswa">-</span></div>
+            <div style="font-size: 13px; color: #059669; font-weight: 600; margin-top: 4px;">Saldo Saat Ini: <span id="modalSaldoSiswa">Rp 0</span></div>
+        </div>
+
+        <form onsubmit="simpanTransaksiScan(event)">
+            <input type="hidden" id="scanSiswaObj">
+
+            <label style="font-size: 13px; font-weight: 500;">Jenis Transaksi</label>
+            <select id="scanJenis" class="form-control" style="margin-top: 5px; margin-bottom: 12px;">
+                <option value="SETOR">SETOR (Tambah Tabungan)</option>
+                <option value="TARIK">TARIK (Penarikan Tunai)</option>
+            </select>
+
+            <label style="font-size: 13px; font-weight: 500;">Nominal (Rp)</label>
+            <input type="number" id="scanNominal" class="form-control" placeholder="Masukkan jumlah nominal..." style="margin-top: 5px; margin-bottom: 15px;" required min="500">
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn" style="background: #94a3b8;" onclick="tutupModalTransaksiScan()">Batal</button>
+                <button type="submit" class="btn btn-submit" style="width: auto;">Simpan Transaksi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalSertifikat">
+    <div class="modal-card">
+        <h3><i class="fa-solid fa-file-signature" style="color: #8b5cf6;"></i> Pengaturan Cetak Sertifikat</h3>
+        <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: 600; color: #64748b;">Nama Kepala Sekolah:</label>
+            <input type="text" id="inputNamaKepsek" class="form-control" placeholder="Contoh: H. Ahmad Dahlan, M.Pd." style="margin-top: 4px;">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label style="font-size: 12px; font-weight: 600; color: #64748b;">NIP Kepala Sekolah:</label>
+            <input type="text" id="inputNipKepsek" class="form-control" placeholder="Contoh: 19750101 200003 1 001" style="margin-top: 4px;">
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button class="btn" style="background: #94a3b8;" onclick="tutupModalSertifikat()">Batal</button>
+            <button class="btn btn-cert" onclick="eksekusiCetakSertifikat()"><i class="fa-solid fa-print"></i> Cetak Sekarang</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SISWA_DEFAULT = [["3052","Amelia Alita Zahra"],["3223","Angelica Vikar Maharani"],["3085","Anggraeni Abbilah Dhety"],["3087","AZKA NAILUN NABHAN"],["3089","Dany Sabiq El-Fathin"],["3090","Dhea Fiky Mazaya"],["3224","Earlita Arsyifa Salsabila"],["3091","Fadilla Rizqi Khaerani"],["3092","Fathan Almaizan Zhafar"],["3093","Gavin Harry Wiriawan"],["3063","Hafiz Ardiyansah"],["3095","Intan Berliyan"],["3096","Luthfiya Nur Ramadhani"],["3069","M. Miftah Al Fattah"],["3097","Mugi Aditia Ripki"],["3098","Muh Azzka Alpratama"],["3099","Muhamad Ramadhani"],["3102","Nayla Dwi Syafriani"],["3108","Puteri Ayuning Kirana"],["3103","Raisa Rahmawati Septiani"],["3104","Renita Nur Saefitri"],["3084","Shalwa Aisa Nazwa"],["3105","Wifha Alya An Adibah"],["3106","Zhidan Dwi Aprilio Nurosy"],["3107","Zulfan Azhar Ramadhan"]];
+    
+    let SISWA = JSON.parse(localStorage.getItem('dbMasterSiswa')) || SISWA_DEFAULT;
+    let dataTransaksi = JSON.parse(localStorage.getItem('dbTabunganSiswa')) || [];
+    
+    let isSaldoVisible = JSON.parse(localStorage.getItem('cfgHideSaldo')) === true; 
+    let html5QrcodeScanner = null;
+    let isProcessingScan = false;
+
+    // WEB APP URL TERBARU
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwuXIpHtrqUjL_djnci9kmJtVbowttmDwssbE4i8bVxOKSIMFAWkBl5zY8EVkk84kmX/exec"; 
+
+    const inputSiswa = document.getElementById('inputSiswa');
+    const inputJenis = document.getElementById('inputJenis');
+    const inputNominal = document.getElementById('inputNominal');
+    const selectNominal = document.getElementById('selectNominal');
+    document.getElementById('inputTanggal').valueAsDate = new Date();
+
+    document.getElementById('inputScanManual').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            prosesHasilScan(this.value);
+        }
+    });
+
+    function tarikDataDariSpreadsheet() {
+        const btn = document.getElementById('btnTarikSheet');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Menarik...";
+        btn.disabled = true;
+
+        fetch(WEB_APP_URL)
+            .then(res => res.json())
+            .then(rows => {
+                if (rows.error) {
+                    alert("❌ Server Error: " + rows.error);
+                    return;
+                }
+                if (!Array.isArray(rows) || rows.length === 0) {
+                    alert("ℹ️ Tidak ada data yang ditemukan di Spreadsheet.");
+                    return;
+                }
+
+                let counterBaru = 0;
+                rows.forEach((row, idx) => {
+                    if (row.length >= 5 && row[0] !== "Tanggal") {
+                        const tglRaw = row[0];
+                        const nis = row[1] ? row[1].toString() : "-";
+                        const nama = row[2] ? row[2].toString() : "";
+                        const jenis = row[3] ? row[3].toString().toUpperCase() : "SETOR";
+                        const nominal = parseRupiah(row[4]);
+
+                        if (nama && nominal > 0) {
+                            const tglIso = parseTanggalExcel(tglRaw);
+                            const tglFormat = new Date(tglIso).toLocaleDateString('id-ID');
+
+                            const duplikat = dataTransaksi.some(t => {
+                                const tglToko = new Date(t.waktu).toLocaleDateString('id-ID');
+                                return tglToko === tglFormat && t.nama === nama && t.jenis === jenis && t.nominal === nominal;
+                            });
+
+                            if (!duplikat) {
+                                dataTransaksi.unshift({
+                                    id: Date.now() + idx,
+                                    waktu: tglIso,
+                                    nis: nis,
+                                    nama: nama,
+                                    jenis: jenis,
+                                    nominal: nominal
+                                });
+                                counterBaru++;
+                            }
+                        }
+                    }
+                });
+
+                if (counterBaru > 0) {
+                    localStorage.setItem('dbTabunganSiswa', JSON.stringify(dataTransaksi));
+                    hitungDanTampilkan();
+                    updateNominalOtomatis();
+                    alert(`✅ Berhasil menarik ${counterBaru} data transaksi baru dari Spreadsheet!`);
+                } else {
+                    alert("ℹ️ Data lokal sudah yang paling terbaru (tidak ada data baru).");
+                }
+            })
+            .catch(err => {
+                alert("❌ Gagal menarik data: " + err.message);
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+
+    function toggleTotalSaldo() {
+        isSaldoVisible = !isSaldoVisible;
+        localStorage.setItem('cfgHideSaldo', JSON.stringify(isSaldoVisible));
+        hitungDanTampilkan();
+    }
+
+    function toggleFilterPanel() {
+        const panel = document.getElementById('filterPanel');
+        const icon = document.getElementById('iconEyeFilter');
+        const label = document.getElementById('labelEyeFilter');
+
+        if (panel.style.display === 'none') {
+            panel.style.display = 'flex';
+            icon.className = 'fa-solid fa-eye';
+            label.innerText = 'Sembunyikan Filter';
+        } else {
+            panel.style.display = 'none';
+            icon.className = 'fa-solid fa-eye-slash';
+            label.innerText = 'Tampilkan Filter';
+        }
+    }
+
+    function pilihNominalOtomatis() {
+        const val = selectNominal.value;
+        if (inputJenis.value === 'PAJAK') return;
+        
+        if (val !== 'manual') {
+            inputNominal.value = val;
+            inputNominal.readOnly = false;
+        } else {
+            inputNominal.value = '';
+            inputNominal.readOnly = false;
+        }
+    }
+
+    function tarikDataSiswa(isManual = false) {
+        const dbPusat = localStorage.getItem('dbMasterSiswa');
+        if (dbPusat) { SISWA = JSON.parse(dbPusat); } else { SISWA = SISWA_DEFAULT; }
+
+        const currentSiswaVal = inputSiswa.value;
+        const currentFilterVal = document.getElementById('filterSiswa').value;
+
+        inputSiswa.innerHTML = "";
+        const selF = document.getElementById('filterSiswa');
+        selF.innerHTML = '<option value="">-- Filter Per Siswa (Lihat Saldo) --</option>';
+
+        SISWA.forEach(s => {
+            const nis = Array.isArray(s) ? s[0] : (s.nis || '-');
+            const nama = Array.isArray(s) ? s[1] : (s.nama || s[0]);
+            inputSiswa.innerHTML += `<option value='{"nis":"${nis}","nama":"${nama}"}'>${nama}</option>`;
+            selF.innerHTML += `<option value="${nama}">${nama}</option>`;
+        });
+
+        if(currentSiswaVal) inputSiswa.value = currentSiswaVal;
+        if(currentFilterVal) selF.value = currentFilterVal;
+
+        if (isManual) {
+            hitungDanTampilkan();
+            alert("Berhasil menyinkronkan daftar nama siswa dengan database pusat!");
+        }
+    }
+
+    function formatRupiah(n) { return "Rp " + parseInt(n).toLocaleString('id-ID'); }
+
+    function parseRupiah(txt) {
+        if (!txt) return 0;
+        return parseInt(txt.toString().replace(/[^0-9]/g, '')) || 0;
+    }
+
+    function parseTanggalExcel(val) {
+        if (!val) return new Date().toISOString();
+        if (!isNaN(val)) {
+            const date = new Date((val - 25569) * 86400 * 1000);
+            return date.toISOString();
+        }
+        let parts = val.toString().split(/[\/\-]/);
+        if (parts.length === 3) {
+            if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]).toISOString(); 
+            let day = parseInt(parts[0], 10);
+            let month = parseInt(parts[1], 10) - 1;
+            let year = parseInt(parts[2], 10);
+            return new Date(year, month, day).toISOString(); 
+        }
+        let parsed = new Date(val);
+        return isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+    }
+
+    function getSaldoSiswa(nama) {
+        return dataTransaksi.reduce((total, t) => {
+            return t.nama === nama ? total + (t.jenis === 'SETOR' ? t.nominal : (t.jenis === 'TARIK' || t.jenis === 'PAJAK' ? -t.nominal : 0)) : total;
+        }, 0);
+    }
+
+    function updateNominalOtomatis() {
+        const siswaObj = JSON.parse(inputSiswa.value || '{}');
+        if (!siswaObj.nama) return;
+
+        const selF = document.getElementById('filterSiswa');
+        selF.value = siswaObj.nama;
+
+        hitungDanTampilkan();
+
+        const saldo = getSaldoSiswa(siswaObj.nama);
+        if (inputJenis.value === 'PAJAK') {
+            inputNominal.value = Math.floor(saldo * 0.025);
+            inputNominal.readOnly = true;
+            selectNominal.disabled = true;
+        } else {
+            selectNominal.disabled = false;
+            if (selectNominal.value === 'manual') {
+                inputNominal.value = '';
+                inputNominal.readOnly = false;
+            } else {
+                inputNominal.value = selectNominal.value;
+            }
+            inputNominal.placeholder = `Saldo: ${formatRupiah(saldo)}`;
+        }
+    }
+
+    inputSiswa.addEventListener('change', updateNominalOtomatis);
+    inputJenis.addEventListener('change', updateNominalOtomatis);
+
+    function bukaModalScanner() {
+        document.getElementById('modalScanner').style.display = 'flex';
+        document.getElementById('inputScanManual').value = '';
+        isProcessingScan = false;
+        
+        setTimeout(() => document.getElementById('inputScanManual').focus(), 300);
+
+        if (!html5QrcodeScanner) {
+            html5QrcodeScanner = new Html5Qrcode("interactive-scanner");
+        }
+
+        if (!html5QrcodeScanner.isScanning) {
+            html5QrcodeScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 220, height: 220 } },
+                (decodedText) => {
+                    if (!isProcessingScan) {
+                        prosesHasilScan(decodedText);
+                    }
+                },
+                () => {}
+            ).catch(err => {
+                console.error("Gagal membuka kamera: ", err);
+            });
+        }
+    }
+
+    function tutupModalScanner() {
+        if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+            html5QrcodeScanner.stop().then(() => {
+                document.getElementById('modalScanner').style.display = 'none';
+                isProcessingScan = false;
+            }).catch(err => {
+                document.getElementById('modalScanner').style.display = 'none';
+                isProcessingScan = false;
+            });
+        } else {
+            document.getElementById('modalScanner').style.display = 'none';
+            isProcessingScan = false;
+        }
+    }
+
+    function prosesHasilScan(query) {
+        if (!query || query.trim() === '') {
+            alert("❌ Harap masukkan atau scan nomor barcode/absensi/NIS!");
+            return;
+        }
+        
+        isProcessingScan = true;
+        const key = query.toString().trim().toLowerCase();
+        let targetSiswa = null;
+
+        SISWA.forEach((s, idx) => {
+            const nis = Array.isArray(s) ? s[0] : (s.nis || '');
+            const nama = Array.isArray(s) ? s[1] : (s.nama || '');
+            const noAbsen = (idx + 1).toString();
+
+            if (key === nis.toLowerCase() || key === noAbsen || key === nama.toLowerCase()) {
+                targetSiswa = { nis, nama, absen: noAbsen };
+            }
+        });
+
+        if (!targetSiswa) {
+            alert(`❌ Siswa dengan Nomor Absen/NIS/Nama "${query}" tidak ditemukan!`);
+            isProcessingScan = false;
+            return;
+        }
+
+        bukaModalTransaksiScan(targetSiswa);
+    }
+
+    function bukaModalTransaksiScan(siswa) {
+        document.getElementById('modalNamaSiswa').innerText = siswa.nama;
+        document.getElementById('modalNisSiswa').innerText = siswa.nis;
+        
+        const saldo = getSaldoSiswa(siswa.nama);
+        document.getElementById('modalSaldoSiswa').innerText = formatRupiah(saldo);
+        
+        document.getElementById('scanSiswaObj').value = JSON.stringify(siswa);
+        document.getElementById('scanNominal').value = '';
+        document.getElementById('modalTransaksiScan').style.display = 'flex';
+        
+        setTimeout(() => document.getElementById('scanNominal').focus(), 200);
+    }
+
+    function tutupModalTransaksiScan() {
+        document.getElementById('modalTransaksiScan').style.display = 'none';
+        document.getElementById('inputScanManual').value = '';
+        setTimeout(() => { 
+            isProcessingScan = false; 
+            document.getElementById('inputScanManual').focus();
+        }, 1500);
+    }
+
+    function simpanTransaksiScan(e) {
+        e.preventDefault();
+        const siswa = JSON.parse(document.getElementById('scanSiswaObj').value);
+        const jenis = document.getElementById('scanJenis').value;
+        const nominal = parseInt(document.getElementById('scanNominal').value);
+        const tglHariIni = new Date().toLocaleDateString('id-ID');
+        
+        if (!nominal || nominal <= 0) {
+            alert("❌ Masukkan nominal transaksi yang valid!");
+            return;
+        }
+
+        const transaksiSudahAda = dataTransaksi.filter(t => {
+            const tglTrans = new Date(t.waktu).toLocaleDateString('id-ID');
+            return tglTrans === tglHariIni && t.nama === siswa.nama;
+        });
+
+        if (transaksiSudahAda.length > 0) {
+            const konfirmasi = confirm(`⚠️ PERINGATAN DOUBLE INPUT!\n\nSiswa "${siswa.nama}" SUDAH memiliki ${transaksiSudahAda.length} transaksi pada hari ini (${tglHariIni}).\n\nApakah Anda yakin tetap ingin menambahkan transaksi baru ini?`);
+            if (!konfirmasi) {
+                return;
+            }
+        }
+
+        const saldoSaatIni = getSaldoSiswa(siswa.nama);
+        if (jenis === 'TARIK' && nominal > saldoSaatIni) {
+            alert(`❌ Saldo tidak mencukupi! Saldo saat ini: ${formatRupiah(saldoSaatIni)}`);
+            return;
+        }
+
+        const newItem = {
+            id: Date.now(),
+            waktu: new Date().toISOString(),
+            nis: siswa.nis,
+            nama: siswa.nama,
+            jenis: jenis,
+            nominal: nominal
+        };
+
+        dataTransaksi.unshift(newItem);
+        localStorage.setItem('dbTabunganSiswa', JSON.stringify(dataTransaksi));
+
+        tutupModalTransaksiScan();
+        hitungDanTampilkan();
+        updateNominalOtomatis();
+
+        if (jenis === 'SETOR') {
+            kirimTransaksiBaruKeSpreadsheet(newItem);
+        }
+
+        alert(`✅ Transaksi ${jenis} sebesar ${formatRupiah(nominal)} untuk ${siswa.nama} berhasil disimpan!\nSilakan lanjutkan scan siswa berikutnya.`);
+    }
+
+    function eksporExcel() {
+        if (typeof XLSX === 'undefined') { alert("❌ Pustaka Excel belum siap."); return; }
+        const workbook = XLSX.utils.table_to_book(document.getElementById('tabelHistoriTabungan'), {sheet: "Riwayat"});
+        XLSX.writeFile(workbook, "Data_Tabungan.xlsx");
+    }
+
+    function hapusSemuaRiwayat() {
+        if (dataTransaksi.length === 0) {
+            alert("ℹ️ Riwayat transaksi memang sudah kosong.");
+            return;
+        }
+        if (confirm("⚠️ PERINGATAN CRITICAL!\nApakah Anda yakin ingin menghapus SELURUH riwayat log transaksi tabungan siswa? Tindakan ini tidak bisa dibatalkan.")) {
+            const passwordInput = prompt("🔒 Masukkan Password Admin untuk otentikasi penghapusan:");
+            if (passwordInput === "ikhwan22") {
+                dataTransaksi = []; 
+                localStorage.removeItem('dbTabunganSiswa'); 
+                hitungDanTampilkan(); 
+                updateNominalOtomatis(); 
+                alert("✅ Sukses! Seluruh database riwayat log transaksi berhasil dibersihkan.");
+            } else if (passwordInput !== null) {
+                alert("❌ Password Salah! Anda tidak memiliki hak akses untuk menghapus database.");
+            }
+        }
+    }
+
+    function prosesImportExcel(e) {
+        if (typeof XLSX === 'undefined') { alert("❌ Pustaka Excel belum siap."); return; }
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            try {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                if (sheetData.length <= 1) {
+                    alert("❌ File Excel kosong atau tidak memiliki baris data.");
+                    return;
+                }
+
+                let counterBerhasil = 0;
+                const barisData = sheetData.slice(1).reverse();
+
+                barisData.forEach((row, index) => {
+                    if (row.length >= 5 && row[2] && row[3]) { 
+                        const tglIso = parseTanggalExcel(row[0]);
+                        const nis = row[1] ? row[1].toString() : "-";
+                        const nama = row[2].toString();
+                        const jenis = row[3].toString().toUpperCase();
+                        const nominal = parseRupiah(row[4]);
+
+                        if (['SETOR', 'TARIK', 'PAJAK'].includes(jenis) && nominal > 0) {
+                            dataTransaksi.unshift({
+                                id: Date.now() + index, 
+                                waktu: tglIso,
+                                nis: nis,
+                                nama: nama,
+                                jenis: jenis,
+                                nominal: nominal
+                            });
+                            counterBerhasil++;
+                        }
+                    }
+                });
+
+                if (counterBerhasil > 0) {
+                    localStorage.setItem('dbTabunganSiswa', JSON.stringify(dataTransaksi));
+                    hitungDanTampilkan();
+                    updateNominalOtomatis();
+                    alert(`✅ Berhasil mengimpor ${counterBerhasil} data transaksi ke riwayat!`);
+                } else {
+                    alert("❌ Tidak ada data yang cocok/valid untuk diimpor.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ Gagal membaca file Excel.");
+            }
+            document.getElementById('importFileExcel').value = "";
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function saveKeTabungan() {
+        const hariIni = new Date().toLocaleDateString('id-ID');
+        eksekusiKirimKeSpreadsheet(hariIni, "Save ke Tabungan");
+    }
+
+    function saveSusulanPilihan() {
+        const inputTanggalUser = prompt("📅 Masukkan tanggal riwayat yang LUPA dikirim:\nFormat harus sama dengan yang ada di tabel.");
+        if (inputTanggalUser === null) return;
+        if (inputTanggalUser.trim() === "") { alert("❌ Tanggal tidak boleh kosong!"); return; }
+        eksekusiKirimKeSpreadsheet(inputTanggalUser.trim(), "Save Susulan");
+    }
+
+    function eksekusiKirimKeSpreadsheet(tanggalTarget, namaTombol) {
+        const rows = Array.from(document.querySelectorAll('#bodyLogTransaksi tr'));
+        if (rows.length === 0) { alert("❌ Gagal: Tidak ada data transaksi di tabel."); return; }
+
+        const dataKirim = [];
+        rows.forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            if (cells.length > 0) {
+                const tanggalTabel = cells[0].innerText;
+                const jenisTransaksi = cells[3].innerText;
+                
+                if (tanggalTabel === tanggalTarget && jenisTransaksi === "SETOR") {
+                    dataKirim.push([
+                        cells[0].innerText, 
+                        cells[1].innerText, 
+                        cells[2].innerText, 
+                        cells[3].innerText, 
+                        cells[4].innerText, 
+                        cells[5].innerText
+                    ]);
+                }
+            }
+        });
+
+        if (dataKirim.length === 0) { 
+            alert(`ℹ️ Tidak ditemukan riwayat 'SETOR' pada tanggal "${tanggalTarget}".`); 
+            return; 
+        }
+        
+        dataKirim.reverse(); 
+
+        const btn = document.querySelector(`button[onclick^='${namaTombol === "Save ke Tabungan" ? "saveKeTabungan" : "saveSusulanPilihan"}']`);
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Mengirim...";
+        btn.disabled = true;
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: dataKirim })
+        })
+        .then(() => { alert(`✅ Sukses Terkirim! (${dataKirim.length} data).`); })
+        .catch(error => { alert("❌ Gagal: " + error.message); })
+        .finally(() => { btn.innerHTML = originalText; btn.disabled = false; });
+    }
+
+    function kirimTransaksiBaruKeSpreadsheet(item) {
+        const tglFormat = new Date(item.waktu).toLocaleDateString('id-ID');
+        const nominalFormat = formatRupiah(item.nominal);
+        const saldoFormat = formatRupiah(getSaldoSiswa(item.nama));
+
+        const singleRowData = [[ tglFormat, item.nis, item.nama, item.jenis, nominalFormat, saldoFormat ]];
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: singleRowData })
+        }).catch(err => console.error("Gagal sync: ", err));
+    }
+
+    function cetakTabungan() {
+        const siswaSelect = document.getElementById('filterSiswa');
+        const siswaNama = siswaSelect.value;
+        if (!siswaNama) { alert("Pilih siswa terlebih dahulu!"); return; }
+
+        let siswaNis = "-";
+        for (let i = 0; i < SISWA.length; i++) {
+            const nama = Array.isArray(SISWA[i]) ? SISWA[i][1] : SISWA[i].nama;
+            const nis = Array.isArray(SISWA[i]) ? SISWA[i][0] : SISWA[i].nis;
+            if (nama === siswaNama) { siswaNis = nis; break; }
+        }
+
+        const barisMulaiInput = document.getElementById('cetakBarisMulai').value;
+        const jumlahBarisInput = document.getElementById('cetakBarisJumlah').value;
+        const barisMulai = barisMulaiInput ? parseInt(barisMulaiInput) : 1;
+        const jumlahBaris = jumlahBarisInput ? parseInt(jumlahBarisInput) : null;
+
+        const originalRows = Array.from(document.querySelectorAll('#bodyLogTransaksi tr'));
+        const rowsKronologis = [...originalRows].reverse();
+        if (rowsKronologis.length === 0) { alert("Tidak ada data transaksi untuk dicetak."); return; }
+
+        let cetakHTML = "";
+        let hitungBarisTercetak = 0;
+
+        for (let i = 1; i < barisMulai; i++) { cetakHTML += `<div class="bubble empty-bubble"></div>`; }
+
+        for (let i = 0; i < rowsKronologis.length; i++) {
+            if (rowsKronologis[i].style.display === 'none') continue;
+            const cells = rowsKronologis[i].getElementsByTagName('td');
+            const tanggal = cells[0].innerText;
+            const jenis = cells[3].innerText;
+            const nominal = cells[4].innerText;
+            const saldo = cells[5].innerText;
+
+            let kelasWarna = jenis === 'SETOR' ? "warna-setor" : (jenis === 'TARIK' ? "warna-tarik" : "warna-pajak");
+
+            cetakHTML += `
+                <div class="bubble">
+                    <div class="no-baris">${barisMulai + hitungBarisTercetak}</div>
+                    <div class="detail-item"><strong>Tgl:</strong> ${tanggal}</div>
+                    <div class="detail-item"><strong>Aksi:</strong> <span class="${kelasWarna}">${jenis}</span></div>
+                    <div class="detail-item"><strong>Nominal:</strong> ${nominal}</div>
+                    <div class="detail-item"><strong>Saldo:</strong> ${saldo}</div>
+                    <div class="paraf">Paraf: ______</div>
+                </div>`;
+            hitungBarisTercetak++;
+            if (jumlahBaris && hitungBarisTercetak === jumlahBaris) break;
+        }
+
+        const statusHeaderClass = (barisMulai === 1) ? "show-on-print" : "hide-on-print";
+        const printWindow = window.open('', '_blank', 'height=600,width=800');
+        printWindow.document.write(`<html><head><title>Buku Tabungan - ${siswaNama}</title><style>body{font-family:'Courier New',monospace;font-size:12px;margin:0;padding:10px;color:#000;}.bank-header{width:100%;margin-bottom:25px;border-bottom:3px double #000;padding-bottom:12px;}.bank-header .title{font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:10px;text-align:center;}.bank-header .meta-grid{display:flex;justify-content:space-between;font-size:11px;}.bubble{display:flex;align-items:center;justify-content:space-between;border:1px solid #000;border-radius:12px;padding:10px 15px;margin-bottom:8px;page-break-inside:avoid;}.no-baris{font-weight:bold;font-size:13px;border-right:1px solid #000;padding-right:12px;width:30px;}.detail-item{flex:1;text-align:left;padding-left:10px;}.paraf{width:90px;text-align:right;font-size:10px;}.empty-bubble{border:1px dashed #ccc;height:40px;margin-bottom:8px;}.warna-setor{color:#10b981!important;font-weight:bold;}.warna-tarik{color:#ef4444!important;font-weight:bold;}.warna-pajak{color:#d97706!important;font-weight:bold;}@media print{body{padding:15mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.hide-on-print{display:none!important;}.show-on-print{display:block!important;}}</style></head><body><div class="bank-header ${statusHeaderClass}"><div class="title">LAPORAN MUTASI TABUNGAN SISWA</div><div class="meta-grid"><div class="meta-left"><div><strong>NAMA LENGKAP :</strong> ${siswaNama.toUpperCase()}</div><div><strong>NOMOR INDUK  :</strong> ${siswaNis}</div></div><div class="meta-right" style="text-align:right;"><div><strong>ID UNIT     :</strong> KELAS_VI</div><div><strong>TGL CETAK   :</strong> ${new Date().toLocaleDateString('id-ID')}</div></div></div></div><div class="container-bubble">${cetakHTML}</div><script>window.onload=()=>{window.print();window.close();}<\/script></body></html>`);
+        printWindow.document.close();
+    }
+
+    function cetakHarianPDF() {
+        const today = new Date().toDateString();
+        const transaksiHariIni = dataTransaksi.filter(t => new Date(t.waktu).toDateString() === today);
+        if (transaksiHariIni.length === 0) { alert("Tidak ada transaksi hari ini."); return; }
+        
+        let totalSetor = 0, totalTarik = 0, rows = "";
+        transaksiHariIni.forEach((t, index) => {
+            rows += `<tr><td>${index + 1}</td><td>${t.nama}</td><td>${t.jenis}</td><td>${formatRupiah(t.nominal)}</td></tr>`;
+            if (t.jenis === 'SETOR') totalSetor += t.nominal; else totalTarik += t.nominal;
+        });
+
+        const printWindow = window.open('', '_blank', 'height=600,width=800');
+        printWindow.document.write(`<html><head><title>Laporan Harian</title><style>body{font-family:sans-serif; padding:20px;} table{width:100%; border-collapse:collapse; margin-top:20px;} th,td{border:1px solid #333; padding:8px; text-align:center;} h2{text-align:center;}</style></head><body><h2>Laporan Transaksi Harian: ${new Date().toLocaleDateString('id-ID')}</h2><table><thead><tr><th>No</th><th>Nama Siswa</th><th>Jenis</th><th>Nominal</th></tr></thead><tbody>${rows}</body></table><div style="margin-top:20px;"><p><strong>Total Setor:</strong> ${formatRupiah(totalSetor)}</p><p><strong>Total Tarik:</strong> ${formatRupiah(totalTarik)}</p></div><script>window.onload = () => { window.print(); window.close(); }<\/script></body></html>`);
+        printWindow.document.close();
+    }
+
+    function bukaModalSertifikat() {
+        const savedKepsek = JSON.parse(localStorage.getItem('cfgKepsek')) || { nama: '', nip: '' };
+        document.getElementById('inputNamaKepsek').value = savedKepsek.nama;
+        document.getElementById('inputNipKepsek').value = savedKepsek.nip;
+        document.getElementById('modalSertifikat').style.display = 'flex';
+    }
+
+    function tutupModalSertifikat() {
+        document.getElementById('modalSertifikat').style.display = 'none';
+    }
+
+    function eksekusiCetakSertifikat() {
+        const namaKepsek = document.getElementById('inputNamaKepsek').value.trim();
+        const nipKepsek = document.getElementById('inputNipKepsek').value.trim();
+
+        if (!namaKepsek) {
+            alert("Harap isi nama Kepala Sekolah terlebih dahulu!");
+            return;
+        }
+
+        localStorage.setItem('cfgKepsek', JSON.stringify({ nama: namaKepsek, nip: nipKepsek }));
+        tutupModalSertifikat();
+
+        cetakSertifikatRajin(namaKepsek, nipKepsek);
+    }
+
+    function cariFotoSiswa(nis, nama) {
+        const dbMaster = JSON.parse(localStorage.getItem('dbMasterSiswa')) || [];
+        for (let item of dbMaster) {
+            let itemNis = Array.isArray(item) ? item[0] : item.nis;
+            let itemNama = Array.isArray(item) ? item[1] : item.nama;
+            let itemFoto = item.foto || item.fotoSiswa || item[2];
+
+            if ((itemNis && String(itemNis) === String(nis)) || (itemNama && itemNama.toLowerCase() === nama.toLowerCase())) {
+                if (itemFoto && typeof itemFoto === 'string' && itemFoto.trim().length > 0) {
+                    return itemFoto;
+                }
+            }
+        }
+        return null;
+    }
+
+    function cetakSertifikatRajin(namaKepsek, nipKepsek) {
+        let saldoSiswaMap = {};
+        
+        SISWA.forEach(s => {
+            const nis = Array.isArray(s) ? s[0] : (s.nis || '-');
+            const nama = Array.isArray(s) ? s[1] : (s.nama || s[0]);
+            saldoSiswaMap[nama] = { nis: nis, nama: nama, saldo: 0 };
+        });
+
+        dataTransaksi.forEach(t => {
+            if (!saldoSiswaMap[t.nama]) {
+                saldoSiswaMap[t.nama] = { nis: t.nis || '-', nama: t.nama, saldo: 0 };
+            }
+            if (t.jenis === 'SETOR') {
+                saldoSiswaMap[t.nama].saldo += t.nominal;
+            } else if (t.jenis === 'TARIK' || t.jenis === 'PAJAK') {
+                saldoSiswaMap[t.nama].saldo -= t.nominal;
+            }
+        });
+
+        let rangkingSiswa = Object.values(saldoSiswaMap)
+            .filter(s => s.saldo > 0)
+            .sort((a, b) => b.saldo - a.saldo)
+            .slice(0, 3);
+
+        if (rangkingSiswa.length === 0) {
+            alert("Belum ada data saldo siswa yang mencukupi untuk dicetak sertifikat!");
+            return;
+        }
+
+        const gelarPeringkat = ["TERAJIN I (PERTAMA)", "TERAJIN II (KEDUA)", "TERAJIN III (KETIGA)"];
+        const waliKelasNama = "Ikhwan Adi Yanto, S.Pd.";
+        const waliKelasNip = "NIP.19890802 202221 1 013";
+        const formatNipKepsek = nipKepsek ? `NIP. ${nipKepsek}` : '';
+
+        let certPagesHTML = "";
+
+        rangkingSiswa.forEach((siswa, index) => {
+            const fotoDataUrl = cariFotoSiswa(siswa.nis, siswa.nama);
+            
+            let photoElement = "";
+            if (fotoDataUrl) {
+                photoElement = `<img src="${fotoDataUrl}" class="student-photo-img" alt="Foto ${siswa.nama}">`;
+            } else {
+                photoElement = `
+                    <div class="student-photo-placeholder">
+                        <i class="fa-solid fa-user student-photo-icon"></i>
+                        <span>PASFOTO 3x4</span>
+                    </div>`;
+            }
+
+            certPagesHTML += `
+                <div class="cert-card">
+                    <div class="cert-border">
+                        <div class="cert-inner">
+                            <div class="cert-header">
+                                <h1 class="cert-title">SERTIFIKAT PENGHARGAAN</h1>
+                                <p class="cert-subtitle">Diberikan Sebagai Apresiasi Atas Kedisiplinan & Keaktifan Menabung</p>
+                            </div>
+                            
+                            <div class="cert-body">
+                                <p style="font-size: 13px; color: #475569; margin-bottom: 3px;">Sertifikat ini secara resmi dianugerahkan kepada:</p>
+                                <h2 class="student-name">${siswa.nama}</h2>
+                                <p class="student-nis">NIS: ${siswa.nis}</p>
+                                
+                                <div class="student-photo-wrapper">
+                                    <div class="student-photo-frame">
+                                        ${photoElement}
+                                    </div>
+                                </div>
+
+                                <p style="font-size: 13.5px; color: #334155; max-width: 700px; margin: 6px auto; line-height: 1.4;">
+                                    Sebagai <strong>SISWA SISWI TERAJIN MENABUNG ${gelarPeringkat[index]}</strong> Pada Kelas VI Tahun Ajaran ${new Date().getFullYear()}/${new Date().getFullYear()+1} dengan Total Akumulasi Tabungan Sebesar <strong>${formatRupiah(siswa.saldo)}</strong>.
+                                </p>
+                            </div>
+
+                            <div class="cert-footer">
+                                <div class="sig-box">
+                                    <p class="sig-role">Wali Kelas VI</p>
+                                    <div class="sig-space"></div>
+                                    <p class="sig-name">${waliKelasNama}</p>
+                                    <p class="sig-nip">${waliKelasNip}</p>
+                                </div>
+                                <div class="badge-gold">
+                                    <i class="fa-solid fa-award"></i>
+                                    <span>JUARA ${index + 1}</span>
+                                </div>
+                                <div class="sig-box">
+                                    <p class="sig-role">Kepala Sekolah</p>
+                                    <div class="sig-space"></div>
+                                    <p class="sig-name">${namaKepsek}</p>
+                                    <p class="sig-nip">${formatNipKepsek}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        const printWin = window.open('', '_blank', 'height=750,width=1050');
+        printWin.document.write(`
+            <html>
+            <head>
+                <title>Cetak Sertifikat Siswa Rajin Menabung</title>
+                <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Great+Vibes&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+                <style>
+                    * { margin:0; padding:0; box-sizing:border-box; }
+                    body { background: #cbd5e1; font-family: 'Poppins', sans-serif; }
+                    .cert-card { width: 297mm; height: 210mm; padding: 8mm; background: #fff; margin: 20px auto; page-break-after: always; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+                    .cert-border { width: 100%; height: 100%; border: 6px double #b45309; padding: 6px; position: relative; background: #fffdfa; }
+                    .cert-inner { width: 100%; height: 100%; border: 2px solid #d97706; padding: 18px 25px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+                    .cert-title { font-family: 'Cinzel', serif; font-size: 28px; color: #78350f; letter-spacing: 3px; font-weight: 800; margin-top: 2px; }
+                    .cert-subtitle { font-size: 11px; color: #d97706; text-transform: uppercase; letter-spacing: 2px; font-weight: 600; margin-top: 2px; }
+                    .student-name { font-family: 'Great Vibes', cursive; font-size: 40px; color: #1e3a8a; margin: 2px 0 0 0; font-weight: bold; }
+                    .student-nis { font-size: 12px; color: #64748b; font-weight: 600; letter-spacing: 1px; }
+                    
+                    .student-photo-wrapper { margin: 6px auto; display: flex; justify-content: center; }
+                    .student-photo-frame { width: 75px; height: 98px; border: 2px solid #b45309; border-radius: 8px; background: #fef3c7; padding: 3px; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+                    .student-photo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 5px; }
+                    .student-photo-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; height: 100%; width: 100%; }
+                    .student-photo-placeholder span { font-size: 9px; color: #94a3b8; font-weight: 600; }
+                    .student-photo-icon { font-size: 26px; color: #d97706; }
+
+                    .cert-footer { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 20px 5px 20px; }
+                    .sig-box { width: 230px; text-align: center; font-size: 12px; color: #334155; }
+                    .sig-role { font-weight: 600; }
+                    .sig-space { height: 42px; }
+                    .sig-name { font-weight: 700; color: #0f172a; border-bottom: 1px solid #334155; padding-bottom: 2px; display: inline-block; font-size: 13px; }
+                    .sig-nip { font-size: 11px; color: #64748b; margin-top: 2px; }
+                    
+                    .badge-gold { background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; padding: 8px 20px; border-radius: 50px; font-family: 'Cinzel', serif; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(180,83,9,0.3); display: flex; align-items: center; gap: 8px; }
+                    
+                    @media print {
+                        body { background: none; }
+                        .cert-card { margin: 0; box-shadow: none; width: 100vw; height: 100vh; }
+                        @page { size: A4 landscape; margin: 0; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${certPagesHTML}
+                <script>window.onload = () => { window.print(); window.close(); }<\/script>
+            </body>
+            </html>
+        `);
+        printWin.document.close();
+    }
+
+    function tambahTransaksi(e) {
+        e.preventDefault();
+        const obj = JSON.parse(inputSiswa.value);
+        const tgl = document.getElementById('inputTanggal').value;
+        const nominal = parseInt(inputNominal.value);
+        const jenis = inputJenis.value;
+        const editId = document.getElementById('inputEditId').value;
+
+        if (jenis === 'PAJAK' && nominal <= 0) { alert("Saldo tidak cukup untuk pajak."); return; }
+        
+        const formatTglCek = new Date(tgl).toLocaleDateString('id-ID');
+        const duplikatCek = dataTransaksi.some(t => {
+            if (editId && t.id.toString() === editId) return false;
+            const tglToko = new Date(t.waktu).toLocaleDateString('id-ID');
+            return tglToko === formatTglCek && t.nama === obj.nama && t.jenis === jenis && t.nominal === nominal;
+        });
+
+        if (duplikatCek) {
+            alert("⚠️ Transaksi Gagal: Terdeteksi data identik (duplikat)!");
+            return;
+        }
+
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine'; osc1.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gain1.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+            osc1.connect(gain1); gain1.connect(audioCtx.destination);
+            osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
+        } catch (err) {}
+
+        let targetItem;
+
+        if (editId) {
+            const idx = dataTransaksi.findIndex(t => t.id.toString() === editId);
+            if (idx !== -1) {
+                dataTransaksi[idx].waktu = new Date(tgl).toISOString();
+                dataTransaksi[idx].nis = obj.nis;
+                dataTransaksi[idx].nama = obj.nama;
+                dataTransaksi[idx].jenis = jenis;
+                dataTransaksi[idx].nominal = nominal;
+                targetItem = dataTransaksi[idx];
+            }
+            batalEdit();
+        } else {
+            targetItem = {
+                id: Date.now(), 
+                waktu: new Date(tgl).toISOString(), 
+                nis: obj.nis, 
+                nama: obj.nama, 
+                jenis: jenis, 
+                nominal: nominal
+            };
+            dataTransaksi.unshift(targetItem);
+        }
+
+        localStorage.setItem('dbTabunganSiswa', JSON.stringify(dataTransaksi));
+        selectNominal.value = 'manual';
+        inputNominal.value = ''; 
+        inputNominal.readOnly = false;
+        
+        hitungDanTampilkan(); 
+        updateNominalOtomatis();
+
+        if (targetItem.jenis === 'SETOR') {
+            kirimTransaksiBaruKeSpreadsheet(targetItem);
+        }
+    }
+
+    function editTransaksi(id) {
+        const item = dataTransaksi.find(t => t.id === id);
+        if (!item) return;
+
+        document.getElementById('formHeaderTitle').innerText = "Edit Transaksi";
+        document.getElementById('inputEditId').value = item.id;
+
+        let matchingOptionValue = "";
+        for (let option of inputSiswa.options) {
+            try {
+                let parsed = JSON.parse(option.value);
+                if(parsed.nama === item.nama) {
+                    matchingOptionValue = option.value;
+                    break;
+                }
+            } catch(e){}
+        }
+        if (matchingOptionValue) {
+            inputSiswa.value = matchingOptionValue;
+        }
+
+        document.getElementById('inputTanggal').value = new Date(item.waktu).toISOString().split('T')[0];
+        inputJenis.value = item.jenis;
+
+        const presetValues = ["5000", "10000", "20000", "50000", "100000"];
+        if (presetValues.includes(item.nominal.toString())) {
+            selectNominal.value = item.nominal.toString();
+        } else {
+            selectNominal.value = 'manual';
+        }
+
+        inputNominal.value = item.nominal;
+        inputNominal.readOnly = (item.jenis === 'PAJAK');
+
+        document.getElementById('btnSubmitForm').innerText = "Simpan Perubahan";
+        document.getElementById('btnSubmitForm').style.background = "#f59e0b";
+        document.getElementById('btnBatalEdit').style.display = "inline-flex";
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function batalEdit() {
+        document.getElementById('formHeaderTitle').innerText = "Transaksi Baru";
+        document.getElementById('inputEditId').value = "";
+        document.getElementById('formTabungan').reset();
+        document.getElementById('inputTanggal').valueAsDate = new Date();
+        document.getElementById('btnSubmitForm').innerText = "Simpan Transaksi";
+        document.getElementById('btnSubmitForm').style.background = "#4f46e5";
+        document.getElementById('btnBatalEdit').style.display = "none";
+        
+        selectNominal.value = 'manual';
+        document.getElementById('filterSiswa').value = "";
+        hitungDanTampilkan();
+        updateNominalOtomatis();
+    }
+
+    function hitungDanTampilkan() {
+        const today = new Date().toDateString();
+        const filterText = document.getElementById("filterInput").value.toLowerCase();
+        const filterSiswa = document.getElementById("filterSiswa").value;
+        let sHariIni=0, tHariIni=0, totalSemuaSetor=0, totalSemuaTarik=0;
+        const logBody = document.getElementById('bodyLogTransaksi');
+        logBody.innerHTML = '';
+        
+        let saldoBerjalan = {};
+        let dataKronologis = [...dataTransaksi].sort((a,b) => new Date(a.waktu) - new Date(b.waktu));
+        let dataDenganSaldo = dataKronologis.map(t => {
+            if (!saldoBerjalan[t.nama]) saldoBerjalan[t.nama] = 0;
+            if (t.jenis === 'SETOR') saldoBerjalan[t.nama] += t.nominal;
+            else saldoBerjalan[t.nama] -= t.nominal;
+            return { ...t, saldoAkhir: saldoBerjalan[t.nama] };
+        });
+
+        dataDenganSaldo.reverse().forEach(t => {
+            const d = new Date(t.waktu);
+            if (t.jenis === 'SETOR') totalSemuaSetor += t.nominal; else totalSemuaTarik += t.nominal;
+            
+            let warnaJenis = t.jenis === 'SETOR' ? "color:#10b981;font-weight:600;" : (t.jenis==='TARIK' ? "color:#ef4444;font-weight:600;" : "color:#d97706;font-weight:600;");
+            
+            if((filterSiswa === "" || t.nama === filterSiswa) && (t.nama.toLowerCase().includes(filterText) || t.nis.includes(filterText))) {
+                logBody.innerHTML += `
+                <tr>
+                    <td>${d.toLocaleDateString('id-ID')}</td>
+                    <td>${t.nis}</td>
+                    <td>${t.nama}</td>
+                    <td style="${warnaJenis}">${t.jenis}</td>
+                    <td>${formatRupiah(t.nominal)}</td>
+                    <td>${formatRupiah(t.saldoAkhir)}</td>
+                    <td>
+                        <div class="action-cell">
+                            <button class="btn-edit" onclick="editTransaksi(${t.id})" title="Edit Transaksi"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-delete" onclick="hapus(${t.id})" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }
+            if(d.toDateString() === today) { if(t.jenis === 'SETOR') sHariIni += t.nominal; else tHariIni += t.nominal; }
+        });
+        document.getElementById('totalSetorHariIni').innerText = formatRupiah(sHariIni);
+        document.getElementById('totalTarikHariIni').innerText = formatRupiah(tHariIni);
+        
+        const totalNetto = totalSemuaSetor - totalSemuaTarik;
+        const elNetto = document.getElementById('nettoHariIni');
+        const iconEyeSaldo = document.getElementById('iconEyeSaldo');
+
+        if (isSaldoVisible) {
+            elNetto.innerText = formatRupiah(totalNetto);
+            iconEyeSaldo.className = 'fa-solid fa-eye';
+        } else {
+            elNetto.innerText = '••••••••';
+            iconEyeSaldo.className = 'fa-solid fa-eye-slash';
+        }
+    }
+
+    function hapus(id) { if(confirm("Hapus transaksi?")) { dataTransaksi = dataTransaksi.filter(t=>t.id!==id); localStorage.setItem('dbTabunganSiswa', JSON.stringify(dataTransaksi)); hitungDanTampilkan(); updateNominalOtomatis(); } }
+    
+    tarikDataSiswa();
+    updateNominalOtomatis();
+    hitungDanTampilkan();
+</script>
+</body>
+</html>
