@@ -119,6 +119,7 @@
         .btn-import { background: linear-gradient(135deg, #0284c7, #0369a1); }
         .btn-excel { background: linear-gradient(135deg, #10b981, #059669); }
         .btn-save { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .btn-pull { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
         .btn-pdf { background: linear-gradient(135deg, #eab308, #ca8a04); color: #fff; } 
         .btn-back { background: linear-gradient(135deg, #475569, #334155); }
 
@@ -410,6 +411,7 @@
 
             <button class="btn btn-excel" onclick="eksporExcel()"><i class="fa-solid fa-file-excel"></i> Excel</button>
             <button class="btn btn-save" onclick="simpanKeSheets()"><i class="fa-solid fa-cloud-arrow-up"></i> Sheets</button>
+            <button class="btn btn-pull" onclick="tarikDariSheets()"><i class="fa-solid fa-cloud-arrow-down"></i> Tarik Data</button>
             <button class="btn btn-back" onclick="kembaliKeAbsensi()"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
         </div>
     </div>
@@ -497,7 +499,7 @@
 </div>
 
 <script>
-    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycby3j4loXE7K53usU4R0zJVDpapB-NkoB9VpD_RKl5tYiQX90PY6qINv16gX78ZVAcUe/exec";
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwaBnr8XxscO6NLydAhr8DgGaYNv0nSCdJy6vyNpXgkPm2W-p-1etdouKzv3Qudjrd6/exec";
 
     let SISWA = JSON.parse(localStorage.getItem('dbMasterSiswa')) || [];
     let databaseNilai = JSON.parse(localStorage.getItem('dbNilaiPendidikanPancasila')) || {};
@@ -1301,6 +1303,51 @@
         .then(() => alert(`Data Nilai Pendidikan Pancasila (${semAktif}) sukses diproses!`))
         .catch(() => alert("Proses pengiriman selesai!"))
         .finally(() => { btn.innerHTML = "<i class='fa-solid fa-cloud-arrow-up'></i> Sheets"; btn.disabled = false; });
+    }
+
+    function tarikDariSheets() {
+        const semAktif = document.getElementById('semesterSelect').value;
+        const btn = document.querySelector('.btn-pull');
+        btn.innerHTML = "⏳ Menarik..."; btn.disabled = true;
+
+        const urlFetch = `${URL_APPS_SCRIPT}?action=getNilai&semester=${encodeURIComponent(semAktif)}&mapel=${encodeURIComponent("Pendidikan Pancasila")}`;
+
+        fetch(urlFetch)
+        .then(response => response.json())
+        .then(result => {
+            if (result && result.status === 'success' && Array.isArray(result.data)) {
+                let jumlahBerhasil = 0;
+                result.data.forEach(item => {
+                    const baris = document.querySelector(`#bodyNilaiPendidikanPancasila tr[data-nis="${item.nis}"]`);
+                    if (baris) {
+                        const inputsNH = baris.querySelectorAll('.nh');
+                        if (Array.isArray(item.harian)) {
+                            item.harian.forEach((val, idx) => {
+                                if (inputsNH[idx]) inputsNH[idx].value = val !== null ? val : '';
+                            });
+                        }
+                        const inputUTS = baris.querySelector('.uts');
+                        const inputUAS = baris.querySelector('.uas');
+                        if (inputUTS) inputUTS.value = item.uts !== null ? item.uts : '';
+                        if (inputUAS) inputUAS.value = item.uas !== null ? item.uas : '';
+
+                        hitungOtomatisRaport(inputsNH[0] || inputUTS);
+                        jumlahBerhasil++;
+                    }
+                });
+                alert(`Berhasil menarik data nilai Pendidikan Pancasila (${semAktif}) untuk ${jumlahBerhasil} siswa dari Google Sheets!`);
+            } else {
+                alert("Data nilai tidak ditemukan di Google Sheets atau format respon tidak sesuai.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Gagal menarik data dari Google Sheets. Pastikan URL Apps Script dan koneksi internet Anda aktif!");
+        })
+        .finally(() => {
+            btn.innerHTML = "<i class='fa-solid fa-cloud-arrow-down'></i> Tarik Data";
+            btn.disabled = false;
+        });
     }
 
     window.onload = function() {
