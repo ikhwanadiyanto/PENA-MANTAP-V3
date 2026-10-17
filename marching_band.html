@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Penilaian Marching Band Kelas VI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        /* BACKGROUND GRADASI ENERGETIK (Good Mood Vibe) */
+        body { 
+            background: linear-gradient(135deg, #f77062 0%, #fe5196 100%); 
+            padding: 25px; 
+            min-height: 100vh; 
+            color: #334155; 
+        }
+
+        /* CONTAINER DENGAN EFEK GLASSMORPHISM HALUS */
+        .container { 
+            max-width: 1200px; 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 30px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+            padding: 30px; 
+        }
+        
+        /* HEADER SECTION STYLE SINKRON PENA MANTAP */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 3px dashed #fed7aa; 
+            padding-bottom: 25px; 
+            margin-bottom: 25px; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+        .header-title { display: flex; align-items: center; gap: 20px; position: relative; }
+        
+        /* LOGO BUNDAR BERDENYUT (Wadah Penampung Gambar) */
+        .logo-container {
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6); 
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2px; 
+            box-shadow: 0 0 20px rgba(59,130,246,0.5);
+            animation: pulse-glow 2s infinite;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Overlay efek hover "Ubah" pada logo */
+        .logo-container:hover::after {
+            content: "Ubah";
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            font-size: 10px;
+            text-align: center;
+            padding: 2px 0;
+            font-weight: 600;
+        }
+        
+        /* GAYA LOGO GAMBAR KUSTOM */
+        .logo-custom {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: 50%; 
+        }
+        
+        @keyframes pulse-glow {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(59,130,246,0.5); }
+            50% { transform: scale(1.04); box-shadow: 0 0 32px rgba(59,130,246,0.85); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(59,130,246,0.5); }
+        }
+
+        .header-title h1 { font-size: 26px; color: #1e1b4b; font-weight: 700; }
+        .header-title p { font-size: 14px; color: #64748b; font-weight: 500; }
+        
+        /* DROPDOWN & PANEL TOMBOL */
+        .controls-panel { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        
+        .select-semester { 
+            padding: 12px 20px; 
+            border-radius: 16px; 
+            border: 2px solid #3b82f6; 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: #1e3a8a; 
+            outline: none; 
+            cursor: pointer; 
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(59,130,246,0.1);
+            transition: all 0.3s;
+        }
+        .select-semester:hover {
+            background: #eff6ff;
+            transform: translateY(-1px);
+        }
+        
+        /* TOMBOL WARNA CERAH BERGRADASI */
+        .btn { 
+            padding: 12px 22px; 
+            border: none; 
+            border-radius: 16px; 
+            color: #fff; 
+            font-weight: 600; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            font-size: 14px; 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .btn:hover { 
+            transform: translateY(-4px) scale(1.02); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn-excel { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-save { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .btn-pdf { background: linear-gradient(135deg, #a855f7, #9333ea); } 
+        .btn-back { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+
+        /* BUNGKUS TABEL */
+        .table-wrap { 
+            overflow-x: auto; 
+            background: #fff; 
+            border-radius: 20px; 
+            border: 1px solid #e2e8f0; 
+            margin-top: 15px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        
+        /* HEADER TABEL MODERN ELEGAN */
+        th { color: #fff; font-weight: 600; padding: 15px 8px; white-space: nowrap; text-align: center; }
+        .th-utama { background: #1e3a8a; } 
+        .th-komponen { background: #db2777; width: 160px; } 
+        .th-raport { background: #059669; font-size: 15px; width: 150px; } 
+        
+        /* KOLOM DAN BARIS */
+        td { padding: 12px 8px; border-bottom: 1px solid #f1f5f9; text-align: center; }
+        tr:nth-child(even) { background-color: #f8fafc; } 
+        tr:hover { background-color: #f1f5f9 !important; } 
+
+        .col-no { font-weight: 600; color: #64748b; width: 50px; }
+        .col-nis { color: #64748b; width: 80px; font-weight: 500; }
+        
+        /* TEMA ROSE & PEACH PASTEL MENYATU DENGAN APLIKASI */
+        .col-nama { 
+            text-align: left; 
+            min-width: 260px; 
+            font-weight: 500; 
+            color: #475569; 
+            position: sticky; 
+            left: 0; 
+            z-index: 2; 
+            box-shadow: 4px 0 10px rgba(247, 112, 98, 0.08); 
+            border-right: 2px solid #fed7aa; 
+            padding-left: 15px;
+        }
+        tr:nth-child(odd) .col-nama { background-color: #fff5f5 !important; }  
+        tr:nth-child(even) .col-nama { background-color: #fff7ed !important; } 
+        tr:hover .col-nama { background-color: #fecdd3 !important; }          
+
+        /* INPUT NILAI POP & ANIMATIF */
+        .input-nilai { 
+            width: 85px; 
+            padding: 8px 6px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            text-align: center; 
+            font-size: 13px; 
+            font-weight: 600; 
+            outline: none; 
+            transition: all 0.2s ease; 
+            background: #f8fafc;
+        }
+        .input-nilai:focus { 
+            border-color: #db2777; 
+            background: #fff; 
+            box-shadow: 0 0 0 3px rgba(219,39,119,0.2);
+            transform: scale(1.08);
+        }
+        
+        .input-nilai::-webkit-outer-spin-button, .input-nilai::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .input-nilai { -moz-appearance: textfield; }
+
+        /* BOX HASIL AKHIR RAPORT (PREDIKAT HURUF) */
+        .nilai-raport { 
+            color: #059669; 
+            font-size: 16px; 
+            font-weight: 700; 
+            background: #d1fae5; 
+            padding: 6px 16px; 
+            border-radius: 8px; 
+            display: inline-block; 
+            min-width: 55px; 
+        }
+
+        /* CUSTOM SCROLLBAR PASTEL CERIA */
+        .table-wrap::-webkit-scrollbar { height: 10px; }
+        .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* ==================== 🖨️ CSS KHUSUS CETAK PDF PERFECT ==================== */
+        @media print {
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .container { box-shadow: none !important; padding: 0 !important; max-width: 100% !important; background: transparent !important; }
+            .controls-panel, .header-title p, .logo-container:hover::after { display: none !important; }
+            .header { border-bottom: 2px solid #000 !important; margin-bottom: 20px !important; padding-bottom: 10px !important; }
+            .table-wrap { overflow: visible !important; border: none !important; margin-top: 0 !important; box-shadow: none !important; }
+            
+            /* Atur Tabel agar pas di Kertas */
+            table { width: 100% !important; border: 1px solid #000 !important; font-size: 12px !important; }
+            th, td { border: 1px solid #000 !important; padding: 10px 6px !important; color: #000 !important; }
+            th { background: #1e3a8a !important; }
+            .th-komponen { background: #db2777 !important; }
+            .th-raport { background: #059669 !important; }
+            
+            /* Matikan properti sticky agar tidak pecah/tumpang tindih di cetakan */
+            .col-nama { position: static !important; background: transparent !important; border-right: 1px solid #000 !important; }
+            tr:nth-child(odd) .col-nama { background: #fff !important; }
+            tr:nth-child(even) .col-nama { background: #f8fafc !important; }
+            
+            /* Format Tampilan Input Nilai saat dicetak */
+            .input-nilai { border: none !important; background: transparent !important; width: auto !important; font-size: 12px !important; color: #000 !important; }
+            .nilai-raport { background: transparent !important; padding: 0 !important; color: #000 !important; font-size: 12px !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-title">
+            <div class="logo-container" onclick="document.getElementById('inputLogoManual').click();" title="Klik untuk ganti logo manual">
+                <img id="tampilanLogo" src="image_480e7c.png" alt="Logo Mapel" class="logo-custom">
+            </div>
+            <input type="file" id="inputLogoManual" accept="image/*" style="display: none;" onchange="prosesUnggahLogo(this)">
+            
+            <div>
+                <h1>Daftar Nilai Marching Band - Kelas VI</h1>
+                <p>Ekstrakurikuler: Marching Band ✨ Harmoni Dalam Kebersamaan! ✨</p>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <select id="semesterSelect" class="select-semester" onchange="gantiSemester()">
+                <option value="Semester 1">🍂 Semester 1</option>
+                <option value="Semester 2">🌸 Semester 2</option>
+            </select>
+            
+            <button class="btn btn-pdf" onclick="cetakLaporanPDF()"><i class="fa-solid fa-file-pdf"></i> Cetak PDF</button>
+            <button class="btn btn-excel" onclick="eksporExcel()"><i class="fa-solid fa-file-excel"></i> Unduh Excel</button>
+            <button class="btn btn-save" onclick="simpanKeSheets()"><i class="fa-solid fa-cloud-arrow-up"></i> Simpan Ke Sheets</button>
+            <button class="btn btn-back" onclick="kembaliKeAbsensi()"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table id="tabelNilaiMarchingBand">
+            <thead>
+                <tr id="headerRow"></tr>
+            </thead>
+            <tbody id="bodyNilaiMarchingBand"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycby3j4loXE7K53usU4R0zJVDpapB-NkoB9VpD_RKl5tYiQX90PY6qINv16gX78ZVAcUe/exec";
+
+    const MASTER_SISWA_DEFAULT = [
+        ["3052","Amelia Alita Zahra"],["3223","Angelica Vikar Maharani"],["3085","Anggraeni Abbilah Dhety"],
+        ["3087","AZKA NAILUN NABHAN"],["3088","Cinta Anugrah"],["3089","Dany Sabiq El-Fathin"],
+        ["3090","Dhea Fiky Mazaya"],["3224","Earlita Arsyifa Salsabila"],["3091","Fadilla Rizqi Khaerani"],
+        ["3092","Fathan Almaizan Zhafar"],["3093","Gavin Harry Wiriawan"],["3063","Hafiz Ardiyansah"],
+        ["3095","Intan Berliyan"],["3096","Luthfiya Nur Ramadhani"],["3069","M. Miftah Al Fattah"],
+        ["3097","Mugi Aditia Ripki"],["3098","Muh Azzka Alpratama"],["3099","Muhamad Ramadhani"],
+        ["3102","Nayla Dwi Syafriani"],["3108","Puteri Ayuning Kirana"],["3103","Raisa Rahmawati Septiani"],
+        ["3104","Renita Nur Saefitri"],["3084","Shalwa Aisa Nazwa"],["3105","Wifha Alya An Adibah"],
+        ["3106","Zhidan Dwi Aprilio Nurosy"],["3107","Zulfan Azhar Ramadhan"]
+    ];
+
+    let SISWA = JSON.parse(localStorage.getItem('dbMasterSiswa')) || MASTER_SISWA_DEFAULT;
+    let databaseNilai = JSON.parse(localStorage.getItem('dbNilaiMarchingBand')) || {};
+
+    function prosesUnggahLogo(input) {
+        if (input.files && input.files[0]) {
+            const pembacaFile = new FileReader();
+            pembacaFile.onload = function(e) {
+                const hasilBase64 = e.target.result;
+                document.getElementById('tampilanLogo').src = hasilBase64;
+                localStorage.setItem('dbLogoMarchingBand', hasilBase64);
+            };
+            pembacaFile.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function muatLogoTersimpan() {
+        const logoLokal = localStorage.getItem('dbLogoMarchingBand');
+        if (logoLokal) {
+            document.getElementById('tampilanLogo').src = logoLokal;
+        }
+    }
+
+    function inisialisasiTabel() {
+        const header = document.getElementById('headerRow');
+        const semAktif = document.getElementById('semesterSelect').value;
+        
+        header.innerHTML = `
+            <th class="th-utama">No</th>
+            <th class="th-utama">NIS</th>
+            <th class="th-utama col-nama">Nama Siswa</th>
+            <th class="th-komponen">Latihan & Disiplin</th>
+            <th class="th-komponen">Teknik & Harmoni</th>
+            <th class="th-raport">PREDIKAT</th>
+        `;
+
+        const body = document.getElementById('bodyNilaiMarchingBand');
+        body.innerHTML = '';
+
+        if(!databaseNilai[semAktif]) { databaseNilai[semAktif] = {}; }
+
+        SISWA.forEach((siswa, index) => {
+            const nis = siswa[0];
+            const nama = siswa[1];
+            const dataSiswa = databaseNilai[semAktif][nis] || { disiplin: '', harmoni: '', raport: '-' };
+
+            body.innerHTML += `
+                <tr data-nis="${nis}">
+                    <td class="col-no">${index + 1}</td>
+                    <td class="col-nis">${nis}</td>
+                    <td class="col-nama">${nama}</td>
+                    <td><input type="number" class="input-nilai disiplin" min="0" max="100" value="${dataSiswa.disiplin || ''}" oninput="hitungOtomatisRaport(this)"></td>
+                    <td><input type="number" class="input-nilai harmoni" min="0" max="100" value="${dataSiswa.harmoni || ''}" oninput="hitungOtomatisRaport(this)"></td>
+                    <td><b class="nilai-raport">${dataSiswa.raport || '-'}</b></td>
+                </tr>
+            `;
+        });
+    }
+
+    function hitungOtomatisRaport(element) {
+        const baris = element.closest('tr');
+        const nis = baris.getAttribute('data-nis');
+        const semAktif = document.getElementById('semesterSelect').value;
+        
+        const inputDisiplin = baris.querySelector('.disiplin').value;
+        const inputHarmoni = baris.querySelector('.harmoni').value;
+        
+        const nDisiplin = inputDisiplin !== '' ? parseFloat(inputDisiplin) : 0;
+        const nHarmoni = inputHarmoni !== '' ? parseFloat(inputHarmoni) : 0;
+
+        let rataRata = Math.round((nDisiplin + nHarmoni) / 2);
+        
+        let hasilRaport = '-';
+        if (inputDisiplin !== '' || inputHarmoni !== '') {
+            if (rataRata >= 86) hasilRaport = 'A (Sangat Baik)';
+            else if (rataRata >= 71) hasilRaport = 'B (Baik)';
+            else if (rataRata >= 56) hasilRaport = 'C (Cukup)';
+            else hasilRaport = 'D (Kurang)';
+        }
+
+        baris.querySelector('.nilai-raport').innerText = hasilRaport;
+
+        databaseNilai[semAktif][nis] = {
+            harian: Array(30).fill(''), 
+            disiplin: inputDisiplip,
+            harmoni: inputHarmoni,
+            uts: inputDisiplin, 
+            uas: inputHarmoni,   
+            raport: hasilRaport
+        };
+        localStorage.setItem('dbNilaiMarchingBand', JSON.stringify(databaseNilai));
+    }
+
+    function cetakLaporanPDF() {
+        const semAktif = document.getElementById('semesterSelect').value;
+        const judulAsli = document.title;
+        document.title = `Laporan_Nilai_MarchingBand_6_${semAktif.replace(' ', '')}`;
+        window.print();
+        document.title = judulAsli;
+    }
+
+    function gantiSemester() { inisialisasiTabel(); }
+
+    function kembaliKeAbsensi() {
+        if (window.opener && !window.opener.closed) { window.close(); } 
+        else { window.location.href = 'PENA MANTAP.html'; }
+    }
+
+    function eksporExcel() {
+        const semAktif = document.getElementById('semesterSelect').value;
+        const workbook = XLSX.utils.table_to_book(document.getElementById('tabelNilaiMarchingBand'), { raw: true });
+        XLSX.writeFile(workbook, `Nilai_MarchingBand_Kelas6_${semAktif.replace(' ', '')}.xlsx`);
+    }
+
+    function simpanKeSheets() {
+        const semAktif = document.getElementById('semesterSelect').value;
+        const dataPaket = [];
+
+        document.querySelectorAll('#bodyNilaiMarchingBand tr').forEach(baris => {
+            dataPaket.push({
+                nis: baris.getAttribute('data-nis'),
+                nama: baris.querySelector('.col-nama').innerText,
+                harian: Array(30).fill(""),
+                uts: baris.querySelector('.disiplin').value || "",
+                uas: baris.querySelector('.harmoni').value || "",
+                raport: baris.querySelector('.nilai-raport').innerText
+            });
+        });
+
+        if(!confirm(`Kirim & Simpan data nilai kualifikasi Marching Band [ ${semAktif} ] langsung ke Google Sheets?`)) return;
+
+        const btn = document.querySelector('.btn-save');
+        btn.innerHTML = "⏳ Proses Menyimpan..."; btn.disabled = true;
+
+        const dataForm = new URLSearchParams();
+        dataForm.append("postData", JSON.stringify({ data: dataPaket, semester: semAktif, mapel: "Marching Band" }));
+
+        fetch(URL_APPS_SCRIPT, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: dataForm
+        })
+        .then(() => { alert(`Data Predikat Nilai Marching Band (${semAktif}) sukses disimpan ke Google Sheets!`); })
+        .catch(() => { alert("Proses pengiriman selesai! Silakan periksa spreadsheet Anda."); })
+        .finally(() => {
+            btn.innerHTML = "<i class='fa-solid fa-cloud-arrow-up'></i> Simpan ke Google Sheets";
+            btn.disabled = false;
+        });
+    }
+
+    window.onload = function() {
+        muatLogoTersimpan();
+        inisialisasiTabel();
+    };
+</script>
+</body>
+</html>
