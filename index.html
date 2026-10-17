@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Datang - PENA (Pengelolaan Nilai & Administrasi)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Dekorasi Elemen Gelembung Latar Belakang */
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 12s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        /* Top Bar Profile / Login Status */
+        .top-user-bar {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 18px;
+            border-radius: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ffffff;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .user-info i {
+            color: #ff6b6b;
+            font-size: 1.1rem;
+        }
+
+        .btn-auth {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 50px 30px;
+            border-radius: 40px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            border: 4px solid #ffffff;
+            width: 100%;
+            max-width: 1300px;
+            position: relative;
+            z-index: 2;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 30px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.1));
+            animation: bounce 3s infinite ease-in-out;
+            margin-bottom: 10px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-family: 'Comic Neue', cursive;
+            font-weight: 700;
+            font-size: 2.8rem;
+            color: #4a4a4a;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #7a7a7a;
+            font-weight: 600;
+            margin-bottom: 40px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45aaf2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-title {
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.6rem;
+            color: #555;
+            text-align: left;
+            margin: 20px 0 15px 5px;
+            font-weight: 700;
+        }
+
+        .section-title.mystery-title {
+            color: #2c3e50;
+            margin-top: 40px;
+        }
+
+        /* LAYOUT GRID UTAMA */
+        .grid-6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .card-kelas {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 10px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid #ffffff;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card-kelas i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            transition: transform 0.3s;
+        }
+
+        .card-kelas span {
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.2rem;
+            white-space: nowrap;
+        }
+
+        .kelas-1 { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .kelas-2 { background: linear-gradient(135deg, #ff9f43, #ffbd7a); }
+        .kelas-3 { background: linear-gradient(135deg, #feca57, #ffdd67); }
+        .kelas-4 { background: linear-gradient(135deg, #1dd1a1, #10ac84); }
+        .kelas-5 { background: linear-gradient(135deg, #48dbfb, #00d2d3); }
+        .kelas-6 { background: linear-gradient(135deg, #54a0ff, #5f27cd); }
+        
+        .kelas-denah { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+        .kelas-nilai { background: linear-gradient(135deg, #10b981, #059669); }
+        .kelas-ujian { background: linear-gradient(135deg, #a855f7, #ec4899); }
+
+        .card-mystery {
+            background: linear-gradient(135deg, #2c3e50 0%, #0f172a 100%);
+            border: 3px solid #334155;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            cursor: help;
+        }
+
+        .card-mystery i {
+            color: #94a3b8;
+            animation: pulse-icon 2s infinite ease-in-out;
+        }
+
+        .card-mystery span {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        @keyframes pulse-icon {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1) rotate(5deg); opacity: 1; color: #f43f5e; filter: drop-shadow(0 0 8px #f43f5e); }
+        }
+
+        .card-kelas:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-kelas:hover i {
+            transform: scale(1.2) rotate(8deg);
+        }
+
+        .card-mystery:hover {
+            background: linear-gradient(135deg, #1e1e2f 0%, #000000 100%);
+            border-color: #f43f5e;
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+        }
+        
+        .card-mystery:hover span {
+            color: #f43f5e;
+        }
+
+        .card-kelas::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        /* --- MODAL LOGIN POPUP --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .login-card {
+            background: #ffffff;
+            width: 90%;
+            max-width: 440px;
+            border-radius: 30px;
+            padding: 40px 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 4px solid #ffffff;
+            position: relative;
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .login-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            color: #2b569a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 8px 15px rgba(161, 196, 253, 0.4);
+        }
+
+        .login-header h2 {
+            font-family: 'Comic Neue', cursive;
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            color: #a0aec0;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 45px 13px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            color: #2d3748;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #45aaf2;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(69, 170, 242, 0.15);
+        }
+
+        .form-control:focus + .input-icon {
+            color: #45aaf2;
+        }
+
+        /* Toggle Sembunyikan/Tampilkan Password Button */
+        .btn-toggle-pwd {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 1rem;
+            color: #718096;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .btn-toggle-pwd:hover {
+            background-color: #edf2f7;
+            color: #2d3748;
+        }
+
+        .btn-toggle-pwd .emoji-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Checkbox Selalu Ingat Saya */
+        .remember-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 0.88rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #4a5568;
+            user-select: none;
+            font-weight: 500;
+        }
+
+        .checkbox-container input {
+            width: 18px;
+            height: 18px;
+            accent-color: #ff6b6b;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .btn-submit-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-close-modal {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            background: #edf2f7;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-close-modal:hover {
+            background: #e2e8f0;
+            color: #e53e3e;
+        }
+
+        /* Alert Pesan Error */
+        .alert-error {
+            background-color: #fff5f5;
+            border-left: 4px solid #f56565;
+            color: #c53030;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* RESPONSIVE LAYOUT */
+        @media (max-width: 1100px) {
+            .grid-6 {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .grid-6 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            h1 { font-size: 2rem; }
+            .container { padding: 30px 15px; }
+            .top-user-bar {
+                top: 10px;
+                right: 15px;
+                padding: 6px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bubble" style="width: 80px; height: 80px; top: 10%; left: 5%; animation-duration: 8s;"></div>
+    <div class="bubble" style="width: 120px; height: 120px; bottom: 15%; left: 8%; animation-duration: 14s;"></div>
+    <div class="bubble" style="width: 100px; height: 100px; top: 20%; right: 7%; animation-duration: 10s;"></div>
+    <div class="bubble" style="width: 70px; height: 70px; bottom: 8%; right: 12%; animation-duration: 7s;"></div>
+
+    <!-- Status User & Tombol Login/Logout -->
+    <div class="top-user-bar">
+        <div class="user-info" id="userInfo">
+            <i class="fa-solid fa-circle-user"></i>
+            <span id="userStatusText">Tamu (Belum Login)</span>
+        </div>
+        <button class="btn-auth" id="btnAuthAction" onclick="handleAuthAction()">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span id="btnAuthText">Masuk</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="logo-wrapper">
+            <img src="logo.png" alt="Logo Aplikasi" class="logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'48\' fill=\'%23ff7675\'/><path d=\'M30,40 Q50,20 70,40 L65,75 Q50,85 35,75 Z\' fill=\'%23ffeaa7\'/><circle cx=\'40\' cy=\'45\' r=\'5\' fill=\'%232d3436\'/><circle cx=\'60\' cy=\'45\' r=\'5\' fill=\'%232d3436\'/><path d=\'M42,60 Q50,68 58,60\' stroke=\'%232d3436\' stroke-width=\'4\' fill=\'none\'/></svg>';">
+        </div>
+        
+        <h1>Aplikasi PENA</h1>
+        <div class="subtitle">Pengelolaan Nilai dan Administrasi Kelas Interaktif</div>
+        
+        <div class="section-title">✨ Menu Tingkat Kelas</div>
+        <div class="grid-6">
+            <a href="#" class="card-kelas kelas-1">
+                <i class="fa-solid fa-face-smile-beam"></i>
+                <span>Kelas 1</span>
+            </a>
+            <a href="#" class="card-kelas kelas-2">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Kelas 2</span>
+            </a>
+            <a href="#" class="card-kelas kelas-3">
+                <i class="fa-solid fa-palette"></i>
+                <span>Kelas 3</span>
+            </a>
+            <a href="#" class="card-kelas kelas-4">
+                <i class="fa-solid fa-rocket"></i>
+                <span>Kelas 4</span>
+            </a>
+            <a href="#" class="card-kelas kelas-5">
+                <i class="fa-solid fa-flask-vial"></i>
+                <span>Kelas 5</span>
+            </a>
+            <a href="PENA MANTAP.html" class="card-kelas kelas-6">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Kelas 6</span>
+            </a>
+        </div>
+
+        <!-- Judul Bagian Pendukung Guru Kelas 6 -->
+        <div class="section-title mystery-title">👨‍🏫 Menu Pendukung Guru Kelas 6</div>
+        <div class="grid-6">
+            <a href="#" class="card-kelas card-mystery">
+                <i class="fa-solid fa-user-secret"></i>
+                <span>Misteri 1</span>
+            </a>
+            <a href="#" class="card-kelas card-mystery">
+                <i class="fa-solid fa-key"></i>
+                <span>Misteri 2</span>
+            </a>
+            
+            <a href="Denah Tempat Duduk Ujian.html" class="card-kelas kelas-denah">
+                <i class="fa-solid fa-chair"></i>
+                <span>Denah Duduk</span>
+            </a>
+
+            <a href="#" class="card-kelas card-mystery">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Misteri 4</span>
+            </a>
+            <a href="Nilai Ujian.html" class="card-kelas kelas-nilai">
+                <i class="fa-solid fa-file-signature"></i>
+                <span>Nilai Ujian</span>
+            </a>
+            <a href="Rumah Kartu Ujian.html" class="card-kelas kelas-ujian">
+                <i class="fa-solid fa-id-card"></i>
+                <span>Kartu Ujian</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP LOGIN PERSEGI LENGKUNG -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-card">
+            <button class="btn-close-modal" onclick="closeLoginModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h2>Login Akun PENA</h2>
+                <p>Masukkan kredensial untuk mengakses sistem</p>
+            </div>
+
+            <!-- Pesan Kesalahan -->
+            <div class="alert-error" id="loginError">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="errorMessage">Username atau password salah!</span>
+            </div>
+
+            <form id="loginForm" onsubmit="processLogin(event)">
+                <div class="form-group">
+                    <label for="usernameInput">Nama Pengguna (Username)</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="usernameInput" class="form-control" placeholder="Masukkan username" required autocomplete="username">
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordInput">Kata Sandi (Password)</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="passwordInput" class="form-control" placeholder="Masukkan password" required autocomplete="current-password">
+                        <i class="fa-solid fa-key input-icon"></i>
+                        <button type="button" class="btn-toggle-pwd" id="togglePasswordBtn" onclick="togglePasswordVisibility()" title="Perlihatkan/Sembunyikan Sandi">
+                            <span class="emoji-icon" id="toggleEmoji">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="remember-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="rememberMe">
+                        <span>Selalu ingat password</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit-login">
+                    <i class="fa-solid fa-right-to-bracket"></i> Masuk Sekarang
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <audio id="kelasSound" src="sergequadrado-child-says-ok-113118.mp3" preload="auto"></audio>
+    <audio id="mysterySound" src="freesound_community-no-84725.mp3" preload="auto"></audio>
+
+    <script>
+        // --- KONFIGURASI KREDENSIAL LOGIN ---
+        const VALID_USER = "admin";
+        const VALID_PASS = "ikhwan22";
+
+        // --- ELEMEN DOM LOGIN ---
+        const loginModal = document.getElementById('loginModal');
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const rememberMeCheckbox = document.getElementById('rememberMe');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const toggleEmoji = document.getElementById('toggleEmoji');
+        const loginError = document.getElementById('loginError');
+        const userStatusText = document.getElementById('userStatusText');
+        const btnAuthText = document.getElementById('btnAuthText');
+        const btnAuthAction = document.getElementById('btnAuthAction');
+
+        // Status Login saat Halaman Dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('pena_user');
+            const savedRemember = localStorage.getItem('pena_remember');
+
+            if (savedRemember === 'true' && savedUser === VALID_USER) {
+                // Set Otomatis Ter-login
+                setLoggedInState(savedUser);
+            } else if (sessionStorage.getItem('pena_logged_in') === 'true') {
+                setLoggedInState(sessionStorage.getItem('pena_user') || VALID_USER);
+            } else {
+                setLoggedOutState();
+                // Jika ada data tersimpan di localStorage, isikan form
+                if (localStorage.getItem('pena_saved_username')) {
+                    usernameInput.value = localStorage.getItem('pena_saved_username');
+                    passwordInput.value = localStorage.getItem('pena_saved_password') || '';
+                    rememberMeCheckbox.checked = true;
+                }
+            }
+        }
+
+        function setLoggedInState(username) {
+            userStatusText.textContent = `Guru (${username})`;
+            btnAuthText.textContent = "Keluar";
+            btnAuthAction.classList.add('btn-logout');
+            btnAuthAction.setAttribute('onclick', 'processLogout()');
+        }
+
+        function setLoggedOutState() {
+            userStatusText.textContent = "Tamu (Belum Login)";
+            btnAuthText.textContent = "Masuk";
+            btnAuthAction.classList.remove('btn-logout');
+            btnAuthAction.setAttribute('onclick', 'openLoginModal()');
+        }
+
+        function openLoginModal() {
+            loginError.style.display = 'none';
+            loginModal.classList.add('active');
+            setTimeout(() => usernameInput.focus(), 200);
+        }
+
+        function closeLoginModal() {
+            loginModal.classList.remove('active');
+        }
+
+        // --- FITUR SHOW / HIDE PASSWORD DENGAN EMOTIKON PERLIHATKAN/SEMBUNYIKAN ---
+        function togglePasswordVisibility() {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleEmoji.textContent = "🙈"; // Emotikon Sembunyikan Sandi
+                togglePasswordBtn.setAttribute('title', 'Sembunyikan Sandi');
+            } else {
+                passwordInput.type = "password";
+                toggleEmoji.textContent = "👁️"; // Emotikon Perlihatkan Sandi
+                togglePasswordBtn.setAttribute('title', 'Perlihatkan Sandi');
+            }
+        }
+
+        // --- PROSES VALIDASI LOGIN ---
+        function processLogin(event) {
+            event.preventDefault();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (username === VALID_USER && password === VALID_PASS) {
+                loginError.style.display = 'none';
+                
+                // Fitur Always Remember Password
+                if (rememberMeCheckbox.checked) {
+                    localStorage.setItem('pena_remember', 'true');
+                    localStorage.setItem('pena_user', username);
+                    localStorage.setItem('pena_saved_username', username);
+                    localStorage.setItem('pena_saved_password', password);
+                } else {
+                    localStorage.removeItem('pena_remember');
+                    localStorage.removeItem('pena_user');
+                    localStorage.removeItem('pena_saved_username');
+                    localStorage.removeItem('pena_saved_password');
+                }
+
+                sessionStorage.setItem('pena_logged_in', 'true');
+                sessionStorage.setItem('pena_user', username);
+
+                setLoggedInState(username);
+                closeLoginModal();
+                alert(`Selamat datang kembali, ${username}! Login berhasil.`);
+            } else {
+                loginError.style.display = 'flex';
+                document.getElementById('errorMessage').textContent = "Username atau password salah! (Coba: admin / ikhwan22)";
+            }
+        }
+
+        function processLogout() {
+            if (confirm("Apakah Anda yakin ingin keluar?")) {
+                sessionStorage.removeItem('pena_logged_in');
+                sessionStorage.removeItem('pena_user');
+                localStorage.removeItem('pena_remember');
+                localStorage.removeItem('pena_user');
+                setLoggedOutState();
+                alert("Anda telah berhasil keluar.");
+            }
+        }
+
+        function handleAuthAction() {
+            if (sessionStorage.getItem('pena_logged_in') === 'true' || localStorage.getItem('pena_remember') === 'true') {
+                processLogout();
+            } else {
+                openLoginModal();
+            }
+        }
+
+        // --- KONTROL SUARA & MENGUNCI AKSES JIKA BELUM LOGIN ---
+        const normalMenus = document.querySelectorAll('.card-kelas:not(.card-mystery)');
+        const kelasSound = document.getElementById('kelasSound');
+
+        normalMenus.forEach(menu => {
+            menu.addEventListener('click', (e) => {
+                const isLoggedIn = sessionStorage.getItem('pena_logged_in') === 'true' || localStorage.getItem('pena_remember') === 'true';
+                
+                if (!isLoggedIn) {
+                    e.preventDefault();
+                    openLoginModal();
+                    alert("Silakan login terlebih dahulu untuk mengakses menu ini.");
+                    return;
+                }
+
+                const targetUrl = menu.getAttribute('href');
+                
+                if (targetUrl && targetUrl !== '#') {
+                    e.preventDefault();
+                    
+                    kelasSound.currentTime = 0;
+                    kelasSound.play().catch(error => {
+                        window.location.href = targetUrl;
+                    });
+
+                    kelasSound.onended = function() {
+                        window.location.href = targetUrl;
+                    };
+                } else {
+                    kelasSound.currentTime = 0; 
+                    kelasSound.play().catch(error => {
+                        console.log("Pemutaran suara diblokir browser sebelum ada interaksi.");
+                    });
+                    kelasSound.onended = null;
+                }
+            });
+        });
+
+        // --- KONTROL SUARA MENU MISTERI (SENTUH / HOVER) ---
+        const mysteryMenus = document.querySelectorAll('.card-mystery');
+        const mysterySound = document.getElementById('mysterySound');
+
+        mysteryMenus.forEach(menu => {
+            menu.addEventListener('mouseenter', () => {
+                mysterySound.currentTime = 0;
+                mysterySound.play().catch(error => {
+                    console.log("Browser membutuhkan klik pertama pada halaman sebelum suara hover bisa berbunyi.");
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
