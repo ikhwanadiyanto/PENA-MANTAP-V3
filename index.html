@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selamat Datang - PENA (Pengelolaan Nilai & Administrasi)</title>
+    <title>Selamat Datang - PENA KU (Pengelolaan Nilai & Administrasi Kelas Unggul)</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -15,255 +15,430 @@
 
         body, html {
             min-height: 100vh;
+            width: 100%;
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a1c4fd 100%);
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #ffd1ff 50%, #a1c4fd 75%, #c2ffd8 100%);
+            background-size: 300% 300%;
+            animation: gradientBG 14s ease infinite;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            padding: 40px 20px;
+            padding: 20px 40px;
             overflow-x: hidden;
             position: relative;
         }
 
-        /* Dekorasi Elemen Gelembung Latar Belakang */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Dekorasi Gelembung Warna Manis & Transparan */
         .bubble {
             position: absolute;
-            background: rgba(255, 255, 255, 0.4);
             border-radius: 50%;
             pointer-events: none;
-            animation: float 12s infinite ease-in-out;
+            animation: float 9s infinite ease-in-out;
             z-index: 1;
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.1); }
+            0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+            50% { transform: translateY(-35px) scale(1.12) rotate(12deg); }
         }
 
-        /* Top Bar Profile / Login Status */
-        .top-user-bar {
-            position: absolute;
-            top: 20px;
-            right: 25px;
+        /* Top Bar Header */
+        .header-bar {
+            width: 100%;
+            max-width: 1600px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
             z-index: 10;
+            margin-bottom: 10px;
+        }
+
+        .top-user-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px 18px;
-            border-radius: 30px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border: 2px solid #ffffff;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 22px;
+            border-radius: 35px;
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.18);
+            backdrop-filter: blur(12px);
+            border: 3px solid #ffffff;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-weight: 600;
-            color: #333;
-            font-size: 0.95rem;
+            color: #2f3542;
+            font-size: 1rem;
         }
 
         .user-info i {
             color: #ff6b6b;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
 
         .btn-auth {
             background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 9px 20px;
+            border-radius: 25px;
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
-            font-size: 0.88rem;
+            font-size: 0.92rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+            gap: 8px;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.35);
         }
 
         .btn-auth:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
         }
 
         .btn-logout {
             background: linear-gradient(135deg, #ff4757, #ff6b81);
         }
 
+        /* Container Full Screen / Long Grid */
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.85);
-            padding: 50px 30px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 35px 50px 45px 50px;
             border-radius: 40px;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-            border: 4px solid #ffffff;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 25px 70px rgba(255, 107, 107, 0.2);
+            border: 5px solid #ffffff;
             width: 100%;
-            max-width: 1300px;
+            max-width: 1600px;
             position: relative;
             z-index: 2;
             animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            margin-top: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         @keyframes popIn {
-            0% { transform: scale(0.7); opacity: 0; }
+            0% { transform: scale(0.85); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .logo {
-            width: 120px;
-            height: auto;
-            filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.1));
-            animation: bounce 3s infinite ease-in-out;
-            margin-bottom: 10px;
+        /* Styling Animasi Emotikon Menunjuk ke Bawah */
+        .pointing-emoji-wrapper {
+            margin-bottom: 5px;
+            display: inline-block;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        .pointing-emoji {
+            font-size: 4.2rem;
+            display: inline-block;
+            animation: pointingBounce 1.5s infinite ease-in-out;
+            filter: drop-shadow(0px 8px 12px rgba(0, 0, 0, 0.15));
+            user-select: none;
         }
 
+        @keyframes pointingBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(14px) scale(1.15); }
+        }
+
+        /* Animasi Teks Judul Ceria */
         h1 {
             font-family: 'Comic Neue', cursive;
             font-weight: 700;
             font-size: 2.8rem;
-            color: #4a4a4a;
+            color: #1e3799;
             text-transform: uppercase;
+            text-shadow: 3px 3px 0px #f6e58d;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            color: #7a7a7a;
-            font-weight: 600;
-            margin-bottom: 40px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45aaf2);
+            font-size: 1.25rem;
+            color: #3867d6;
+            font-weight: 700;
+            margin-bottom: 28px;
+            background: linear-gradient(90deg, #1e3799, #0984e3, #00b894, #e17055);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: rainbowText 8s linear infinite;
+        }
+
+        @keyframes rainbowText {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
         }
 
         .section-title {
             font-family: 'Comic Neue', cursive;
-            font-size: 1.6rem;
-            color: #555;
+            font-size: 1.8rem;
+            color: #2f3542;
             text-align: left;
-            margin: 20px 0 15px 5px;
+            margin-bottom: 18px;
             font-weight: 700;
-        }
-
-        .section-title.mystery-title {
-            color: #2c3e50;
-            margin-top: 40px;
-        }
-
-        /* LAYOUT GRID UTAMA */
-        .grid-6 {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 15px;
-        }
-
-        .card-kelas {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 25px 10px;
-            border-radius: 20px;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        /* LAYOUT GRID LEGA (3 Kolom x 2 Baris) */
+        .grid-3x2 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            width: 100%;
+        }
+
+        .card-kelas, .card-music {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 24px 30px;
+            border-radius: 28px;
             text-decoration: none;
             color: white;
             font-weight: bold;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 3px solid #ffffff;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid #ffffff;
             position: relative;
             overflow: hidden;
             cursor: pointer;
+            gap: 25px;
         }
 
-        .card-kelas i {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-            transition: transform 0.3s;
+        .card-kelas i.main-icon, .card-music i.main-icon {
+            font-size: 3.2rem;
+            transition: transform 0.35s ease;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            min-width: 60px;
+            text-align: center;
         }
 
-        .card-kelas span {
+        .card-kelas .card-info, .card-music .card-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .card-kelas span.title, .card-music span.title {
             font-family: 'Comic Neue', cursive;
-            font-size: 1.2rem;
-            white-space: nowrap;
+            font-size: 2rem;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
+        .card-kelas span.desc, .card-music span.desc {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        /* Warna Menu Kelas */
         .kelas-1 { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
         .kelas-2 { background: linear-gradient(135deg, #ff9f43, #ffbd7a); }
         .kelas-3 { background: linear-gradient(135deg, #feca57, #ffdd67); }
         .kelas-4 { background: linear-gradient(135deg, #1dd1a1, #10ac84); }
         .kelas-5 { background: linear-gradient(135deg, #48dbfb, #00d2d3); }
         .kelas-6 { background: linear-gradient(135deg, #54a0ff, #5f27cd); }
-        
-        .kelas-denah { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
-        .kelas-nilai { background: linear-gradient(135deg, #10b981, #059669); }
-        .kelas-ujian { background: linear-gradient(135deg, #a855f7, #ec4899); }
 
-        .card-mystery {
-            background: linear-gradient(135deg, #2c3e50 0%, #0f172a 100%);
-            border: 3px solid #334155;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            cursor: help;
+        /* Warna Menu Alat Musik */
+        .music-pianika { background: linear-gradient(135deg, #ff9ff3, #feca57); }
+        .music-angklung { background: linear-gradient(135deg, #48dbfb, #0abde3); }
+        .music-extra1 { background: linear-gradient(135deg, #ff6b81, #ff4757); }
+        .music-extra2 { background: linear-gradient(135deg, #10ac84, #1dd1a1); }
+        .music-extra3 { background: linear-gradient(135deg, #5f27cd, #341f97); }
+        .music-extra4 { background: linear-gradient(135deg, #ffa502, #ff7f50); }
+
+        /* Style Otomatis Ketika File Offline / Belum Tersedia */
+        .card-music.offline-file, .card-kelas.locked {
+            background: linear-gradient(135deg, rgba(178, 190, 195, 0.75), rgba(99, 110, 114, 0.85)) !important;
+            backdrop-filter: blur(6px);
+            cursor: not-allowed !important;
+            opacity: 0.85;
         }
 
-        .card-mystery i {
-            color: #94a3b8;
-            animation: pulse-icon 2s infinite ease-in-out;
+        .card-music.offline-file:hover, .card-kelas.locked:hover {
+            transform: none !important;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12) !important;
         }
 
-        .card-mystery span {
-            color: #64748b;
-            font-style: italic;
+        .card-music.offline-file:hover i.main-icon, .card-kelas.locked:hover i.main-icon {
+            transform: none !important;
+            animation: none !important;
         }
 
-        @keyframes pulse-icon {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.1) rotate(5deg); opacity: 1; color: #f43f5e; filter: drop-shadow(0 0 8px #f43f5e); }
+        /* Badge Status (Gembok atau Belum Tersedia) */
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 3;
+            letter-spacing: 0.5px;
         }
 
-        .card-kelas:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+        .status-badge i {
+            color: #ff7675;
+            font-size: 0.85rem;
         }
 
-        .card-kelas:hover i {
-            transform: scale(1.2) rotate(8deg);
+        /* Animasi Khusus untuk Ikon Pianika & Angklung */
+        @keyframes musicBounceAnim {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-6px) rotate(-8deg) scale(1.1); }
+            75% { transform: translateY(-6px) rotate(8deg) scale(1.1); }
         }
 
-        .card-mystery:hover {
-            background: linear-gradient(135deg, #1e1e2f 0%, #000000 100%);
-            border-color: #f43f5e;
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
-        }
-        
-        .card-mystery:hover span {
-            color: #f43f5e;
+        .animated-music-icon {
+            animation: musicBounceAnim 2s infinite ease-in-out;
         }
 
-        .card-kelas::after {
+        .card-music:not(.offline-file):hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+
+        .card-kelas::after, .card-music::after {
             content: '';
             position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.1);
+            top: -25px;
+            right: -25px;
+            width: 90px;
+            height: 90px;
+            background: rgba(255,255,255,0.2);
             border-radius: 50%;
         }
 
-        /* --- MODAL LOGIN POPUP --- */
+        /* Style Menu Pendukung Terpisah "e-PR" di Bawah */
+        .epr-section-wrapper {
+            margin-top: 25px;
+            width: 100%;
+        }
+
+        .card-epr {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px 30px;
+            border-radius: 24px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            background: linear-gradient(135deg, #e056fd, #686de0);
+            box-shadow: 0 10px 25px rgba(104, 109, 224, 0.3);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid #ffffff;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            gap: 25px;
+        }
+
+        .card-epr i {
+            font-size: 2.8rem;
+            transition: transform 0.35s ease;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .card-epr .card-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .card-epr span.title {
+            font-family: 'Comic Neue', cursive;
+            font-size: 1.8rem;
+            line-height: 1.1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card-epr span.desc {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .card-epr:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 16px 30px rgba(104, 109, 224, 0.4);
+        }
+
+        .card-epr:hover i {
+            transform: scale(1.15) rotate(10deg);
+        }
+
+        /* Footer & Badge Developer */
+        .footer-bar {
+            width: 100%;
+            max-width: 1600px;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            z-index: 10;
+        }
+
+        .developer-badge {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4b6584;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 7px 16px;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+            border: 2px solid #ffffff;
+            backdrop-filter: blur(8px);
+        }
+
+        .developer-badge strong {
+            color: #2d3436;
+            font-weight: 700;
+        }
+
+        /* MODAL POPUP LOGIN */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -384,7 +559,6 @@
             color: #45aaf2;
         }
 
-        /* Toggle Sembunyikan/Tampilkan Password Button */
         .btn-toggle-pwd {
             position: absolute;
             right: 12px;
@@ -411,7 +585,6 @@
             font-size: 1.1rem;
         }
 
-        /* Checkbox Selalu Ingat Saya */
         .remember-group {
             display: flex;
             align-items: center;
@@ -480,7 +653,6 @@
             color: #e53e3e;
         }
 
-        /* Alert Pesan Error */
         .alert-error {
             background-color: #fff5f5;
             border-left: 4px solid #f56565;
@@ -502,116 +674,187 @@
         }
 
         /* RESPONSIVE LAYOUT */
-        @media (max-width: 1100px) {
-            .grid-6 {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
+        @media (max-width: 1200px) {
+            .grid-3x2 {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 18px;
             }
         }
 
-        @media (max-width: 650px) {
-            .grid-6 {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
+        @media (max-width: 768px) {
+            body, html { padding: 15px; }
+            .grid-3x2 {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .card-kelas, .card-music, .card-epr {
+                padding: 18px 22px;
             }
             h1 { font-size: 2rem; }
-            .container { padding: 30px 15px; }
-            .top-user-bar {
-                top: 10px;
-                right: 15px;
-                padding: 6px 14px;
-            }
+            .container { padding: 25px 15px; }
+            .footer-bar { justify-content: center; }
+            .pointing-emoji { font-size: 3.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bubble" style="width: 80px; height: 80px; top: 10%; left: 5%; animation-duration: 8s;"></div>
-    <div class="bubble" style="width: 120px; height: 120px; bottom: 15%; left: 8%; animation-duration: 14s;"></div>
-    <div class="bubble" style="width: 100px; height: 100px; top: 20%; right: 7%; animation-duration: 10s;"></div>
-    <div class="bubble" style="width: 70px; height: 70px; bottom: 8%; right: 12%; animation-duration: 7s;"></div>
+    <!-- Gelembung Warna Manis dan Transparan -->
+    <div class="bubble" style="width: 100px; height: 100px; top: 5%; left: 4%; background: rgba(255, 182, 193, 0.45); animation-duration: 8s;"></div>
+    <div class="bubble" style="width: 140px; height: 140px; bottom: 10%; left: 6%; background: rgba(173, 216, 230, 0.45); animation-duration: 12s;"></div>
+    <div class="bubble" style="width: 110px; height: 110px; top: 10%; right: 5%; background: rgba(255, 218, 185, 0.45); animation-duration: 9s;"></div>
+    <div class="bubble" style="width: 80px; height: 80px; bottom: 15%; right: 9%; background: rgba(221, 160, 221, 0.45); animation-duration: 7s;"></div>
 
-    <!-- Status User & Tombol Login/Logout -->
-    <div class="top-user-bar">
-        <div class="user-info" id="userInfo">
-            <i class="fa-solid fa-circle-user"></i>
-            <span id="userStatusText">Tamu (Belum Login)</span>
+    <!-- Header Top User Bar -->
+    <div class="header-bar">
+        <div class="top-user-bar">
+            <div class="user-info" id="userInfo">
+                <i class="fa-solid fa-circle-user"></i>
+                <span id="userStatusText">Tamu (Belum Login)</span>
+            </div>
+            <button class="btn-auth" id="btnAuthAction" onclick="handleAuthAction()">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span id="btnAuthText">Masuk</span>
+            </button>
         </div>
-        <button class="btn-auth" id="btnAuthAction" onclick="handleAuthAction()">
-            <i class="fa-solid fa-right-to-bracket"></i>
-            <span id="btnAuthText">Masuk</span>
-        </button>
     </div>
 
+    <!-- Container Utama Wide Screen -->
     <div class="container">
-        <div class="logo-wrapper">
-            <img src="logo.png" alt="Logo Aplikasi" class="logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'48\' fill=\'%23ff7675\'/><path d=\'M30,40 Q50,20 70,40 L65,75 Q50,85 35,75 Z\' fill=\'%23ffeaa7\'/><circle cx=\'40\' cy=\'45\' r=\'5\' fill=\'%232d3436\'/><circle cx=\'60\' cy=\'45\' r=\'5\' fill=\'%232d3436\'/><path d=\'M42,60 Q50,68 58,60\' stroke=\'%232d3436\' stroke-width=\'4\' fill=\'none\'/></svg>';">
+        <!-- Emotikon Menunjuk ke Bawah dengan Animasi Bounce -->
+        <div class="pointing-emoji-wrapper">
+            <span class="pointing-emoji" role="img" aria-label="Menunjuk ke bawah">👇</span>
         </div>
         
-        <h1>Aplikasi PENA</h1>
-        <div class="subtitle">Pengelolaan Nilai dan Administrasi Kelas Interaktif</div>
+        <!-- Teks Judul Animasi -->
+        <h1>Selamat Datang Di Aplikasi PENA-KU</h1>
+        <div class="subtitle">✨ Pengelolaan Nilai dan Administrasi Kelas Unggul ✨</div>
         
-        <div class="section-title">✨ Menu Tingkat Kelas</div>
-        <div class="grid-6">
-            <a href="#" class="card-kelas kelas-1">
-                <i class="fa-solid fa-face-smile-beam"></i>
-                <span>Kelas 1</span>
+        <!-- 1. Menu Tingkat Kelas (1 s.d 6) -->
+        <div class="section-title">🎈 Menu Tingkat Kelas</div>
+        <div class="grid-3x2" id="kelasGrid">
+            <a href="PENA MANTAP V1.html" class="card-kelas kelas-1 locked" data-menu="1">
+                <div class="status-badge"><i class="fa-solid fa-lock"></i> Terkunci</div>
+                <i class="fa-solid fa-face-smile-beam main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Kelas 1</span>
+                    <span class="desc">Administrasi & Nilai Kelas 1</span>
+                </div>
             </a>
-            <a href="#" class="card-kelas kelas-2">
-                <i class="fa-solid fa-shapes"></i>
-                <span>Kelas 2</span>
+            <a href="PENA MANTAP V2.html" class="card-kelas kelas-2 locked" data-menu="2">
+                <div class="status-badge"><i class="fa-solid fa-lock"></i> Terkunci</div>
+                <i class="fa-solid fa-shapes main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Kelas 2</span>
+                    <span class="desc">Administrasi & Nilai Kelas 2</span>
+                </div>
             </a>
-            <a href="#" class="card-kelas kelas-3">
-                <i class="fa-solid fa-palette"></i>
-                <span>Kelas 3</span>
+            <a href="PENA MANTAP V3.html" class="card-kelas kelas-3 locked" data-menu="3">
+                <div class="status-badge"><i class="fa-solid fa-lock"></i> Terkunci</div>
+                <i class="fa-solid fa-palette main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Kelas 3</span>
+                    <span class="desc">Administrasi & Nilai Kelas 3</span>
+                </div>
             </a>
-            <a href="#" class="card-kelas kelas-4">
-                <i class="fa-solid fa-rocket"></i>
-                <span>Kelas 4</span>
+            <a href="PENA MANTAP V4.html" class="card-kelas kelas-4 locked" data-menu="4">
+                <div class="status-badge"><i class="fa-solid fa-lock"></i> Terkunci</div>
+                <i class="fa-solid fa-rocket main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Kelas 4</span>
+                    <span class="desc">Administrasi & Nilai Kelas 4</span>
+                </div>
             </a>
-            <a href="#" class="card-kelas kelas-5">
-                <i class="fa-solid fa-flask-vial"></i>
-                <span>Kelas 5</span>
+            <a href="PENA MANTAP V5.html" class="card-kelas kelas-5 locked" data-menu="5">
+                <div class="status-badge"><i class="fa-solid fa-lock"></i> Terkunci</div>
+                <i class="fa-solid fa-flask-vial main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Kelas 5</span>
+                    <span class="desc">Administrasi & Nilai Kelas 5</span>
+                </div>
             </a>
-            <a href="PENA MANTAP.html" class="card-kelas kelas-6">
-                <i class="fa-solid fa-graduation-cap"></i>
-                <span>Kelas 6</span>
+            <a href="PENA MANTAP V6.html" class="card-kelas kelas-6 locked" data-menu="6">
+                <div class="status-badge"><i class="fa-solid fa-lock"></i> Terkunci</div>
+                <i class="fa-solid fa-graduation-cap main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Kelas 6</span>
+                    <span class="desc">Administrasi & Nilai Utama Kelas 6</span>
+                </div>
             </a>
         </div>
 
-        <!-- Judul Bagian Pendukung Guru Kelas 6 -->
-        <div class="section-title mystery-title">👨‍🏫 Menu Pendukung Guru Kelas 6</div>
-        <div class="grid-6">
-            <a href="#" class="card-kelas card-mystery">
-                <i class="fa-solid fa-user-secret"></i>
-                <span>Misteri 1</span>
-            </a>
-            <a href="#" class="card-kelas card-mystery">
-                <i class="fa-solid fa-key"></i>
-                <span>Misteri 2</span>
-            </a>
-            
-            <a href="Denah Tempat Duduk Ujian.html" class="card-kelas kelas-denah">
-                <i class="fa-solid fa-chair"></i>
-                <span>Denah Duduk</span>
+        <!-- 2. Menu Alat Musik Interaktif (Pengecekan File Otomatis ke GitHub) -->
+        <div class="section-title" style="margin-top: 35px;">🎵 Menu Media Alat Musik Interaktif</div>
+        <div class="grid-3x2" id="musicGrid">
+            <!-- PIANIKA -->
+            <a href="Pianika-Ku.html" class="card-music music-pianika" data-file="Pianika-Ku.html">
+                <i class="fa-solid fa-music main-icon animated-music-icon"></i>
+                <div class="card-info">
+                    <span class="title">Pianika</span>
+                    <span class="desc">Virtual Pianika-Ku Interaktif</span>
+                </div>
             </a>
 
-            <a href="#" class="card-kelas card-mystery">
-                <i class="fa-solid fa-box-archive"></i>
-                <span>Misteri 4</span>
+            <!-- ANGKLUNG -->
+            <a href="Angklung-Ku.html" class="card-music music-angklung" data-file="Angklung-Ku.html">
+                <i class="fa-solid fa-bell main-icon animated-music-icon" style="animation-delay: 0.5s;"></i>
+                <div class="card-info">
+                    <span class="title">Angklung</span>
+                    <span class="desc">Virtual Angklung-Ku Tradisional</span>
+                </div>
             </a>
-            <a href="Nilai Ujian.html" class="card-kelas kelas-nilai">
-                <i class="fa-solid fa-file-signature"></i>
-                <span>Nilai Ujian</span>
+
+            <!-- 4 Alat Musik Tambahan -->
+            <a href="Drum-Ku.html" class="card-music music-extra1" data-file="Drum-Ku.html">
+                <i class="fa-solid fa-drum main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Drum / Perkusi</span>
+                    <span class="desc">Alat Musik Ritmis Interaktif</span>
+                </div>
             </a>
-            <a href="Rumah Kartu Ujian.html" class="card-kelas kelas-ujian">
-                <i class="fa-solid fa-id-card"></i>
-                <span>Kartu Ujian</span>
+            <a href="Gitar-Ku.html" class="card-music music-extra2" data-file="Gitar-Ku.html">
+                <i class="fa-solid fa-guitar main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Gitar Akustik</span>
+                    <span class="desc">Alat Musik Harmonis Digital</span>
+                </div>
+            </a>
+            <a href="Keyboard-Ku.html" class="card-music music-extra3" data-file="Keyboard-Ku.html">
+                <i class="fa-solid fa-compact-disc main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Keyboard</span>
+                    <span class="desc">Synthesizer Digital Modern</span>
+                </div>
+            </a>
+            <a href="Suling-Ku.html" class="card-music music-extra4" data-file="Suling-Ku.html">
+                <i class="fa-solid fa-wind main-icon"></i>
+                <div class="card-info">
+                    <span class="title">Suling / Rekorder</span>
+                    <span class="desc">Alat Musik Tiup Nusantara</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- 3. Menu Pendukung Terpisah "e-PR" -->
+        <div class="epr-section-wrapper">
+            <a href="e-PR.html" class="card-epr" data-file="e-PR.html">
+                <i class="fa-solid fa-book-open-reader"></i>
+                <div class="card-info">
+                    <span class="title">e-PR (Electronic Peer Review / Pelaporan)</span>
+                    <span class="desc">Menu pendukung interaktif publik yang dapat diakses langsung oleh tamu</span>
+                </div>
             </a>
         </div>
     </div>
 
-    <!-- MODAL POPUP LOGIN PERSEGI LENGKUNG -->
+    <!-- Footer Developer Info -->
+    <div class="footer-bar">
+        <div class="developer-badge">
+            Aplikasi ini dibuat oleh : <strong>Ikhwan Adi Yanto, S.Pd.</strong> tahun 2026
+        </div>
+    </div>
+
+    <!-- MODAL POPUP LOGIN -->
     <div class="modal-overlay" id="loginModal">
         <div class="login-card">
             <button class="btn-close-modal" onclick="closeLoginModal()">
@@ -622,14 +865,13 @@
                 <div class="login-icon">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h2>Login Akun PENA</h2>
-                <p>Masukkan kredensial untuk mengakses sistem</p>
+                <h2>Login Akun PENA KU</h2>
+                <p>Masukkan kredensial untuk membuka kunci sistem kelas</p>
             </div>
 
-            <!-- Pesan Kesalahan -->
             <div class="alert-error" id="loginError">
                 <i class="fa-solid fa-circle-exclamation"></i>
-                <span id="errorMessage">Username atau password salah!</span>
+                <span id="errorMessage">Nama pengguna atau kata sandi yang Anda masukkan salah. Silakan coba lagi.</span>
             </div>
 
             <form id="loginForm" onsubmit="processLogin(event)">
@@ -666,15 +908,13 @@
         </div>
     </div>
 
-    <audio id="kelasSound" src="sergequadrado-child-says-ok-113118.mp3" preload="auto"></audio>
-    <audio id="mysterySound" src="freesound_community-no-84725.mp3" preload="auto"></audio>
+    <!-- Audio Element Global -->
+    <audio id="globalSound" src="sergequadrado-child-says-ok-113118.mp3" preload="auto"></audio>
 
     <script>
-        // --- KONFIGURASI KREDENSIAL LOGIN ---
         const VALID_USER = "admin";
-        const VALID_PASS = "ikhwan22";
+        const VALID_PASS = "kelaskuasyik";
 
-        // --- ELEMEN DOM LOGIN ---
         const loginModal = document.getElementById('loginModal');
         const usernameInput = document.getElementById('usernameInput');
         const passwordInput = document.getElementById('passwordInput');
@@ -685,24 +925,75 @@
         const userStatusText = document.getElementById('userStatusText');
         const btnAuthText = document.getElementById('btnAuthText');
         const btnAuthAction = document.getElementById('btnAuthAction');
+        const kelasCards = document.querySelectorAll('.card-kelas');
+        const musicCards = document.querySelectorAll('.card-music');
+        const globalSound = document.getElementById('globalSound');
 
-        // Status Login saat Halaman Dimuat
         document.addEventListener('DOMContentLoaded', () => {
             checkLoginStatus();
+            checkFilesAvailability(); // Jalankan pengecekan file saat halaman dimuat
         });
+
+        // --- FUNGSI DETEKSI FILE ONLINE/OFFLINE (UNTUK GITHUB) ---
+        async function checkFilesAvailability() {
+            const checkableCards = document.querySelectorAll('.card-music, .card-epr');
+            
+            for (let card of checkableCards) {
+                const fileUrl = card.getAttribute('data-file');
+                if (!fileUrl) continue;
+
+                try {
+                    // Melakukan fetch header untuk memeriksa apakah file tersedia di server/GitHub
+                    let response = await fetch(fileUrl, { method: 'HEAD' });
+                    if (!response.ok) {
+                        markCardAsOffline(card);
+                    }
+                } catch (error) {
+                    // Jika gagal (file belum di-upload / offline)
+                    markCardAsOffline(card);
+                }
+            }
+        }
+
+        function markCardAsOffline(card) {
+            card.classList.add('offline-file');
+            // Tambahkan badge "Belum Tersedia" di pojok kanan atas kartu
+            if (!card.querySelector('.status-badge')) {
+                const badge = document.createElement('div');
+                badge.className = 'status-badge';
+                badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Belum Tersedia';
+                card.appendChild(badge);
+            }
+        }
+
+        // --- FUNGSI GLOBAL PEMUTAR SUARA ---
+        function playSoundAndProceed(callback) {
+            globalSound.currentTime = 0;
+            globalSound.play().catch(err => {
+                console.log("Audio dicegah oleh browser sebelum interaksi.");
+            });
+
+            if (callback) {
+                globalSound.onended = function() {
+                    callback();
+                    globalSound.onended = null;
+                };
+                setTimeout(() => {
+                    if (globalSound.paused) callback();
+                }, 1000);
+            }
+        }
 
         function checkLoginStatus() {
             const savedUser = localStorage.getItem('pena_user');
             const savedRemember = localStorage.getItem('pena_remember');
 
             if (savedRemember === 'true' && savedUser === VALID_USER) {
-                // Set Otomatis Ter-login
                 setLoggedInState(savedUser);
             } else if (sessionStorage.getItem('pena_logged_in') === 'true') {
                 setLoggedInState(sessionStorage.getItem('pena_user') || VALID_USER);
             } else {
                 setLoggedOutState();
-                // Jika ada data tersimpan di localStorage, isikan form
                 if (localStorage.getItem('pena_saved_username')) {
                     usernameInput.value = localStorage.getItem('pena_saved_username');
                     passwordInput.value = localStorage.getItem('pena_saved_password') || '';
@@ -715,82 +1006,115 @@
             userStatusText.textContent = `Guru (${username})`;
             btnAuthText.textContent = "Keluar";
             btnAuthAction.classList.add('btn-logout');
-            btnAuthAction.setAttribute('onclick', 'processLogout()');
+
+            kelasCards.forEach(card => {
+                card.classList.remove('locked');
+                const badge = card.querySelector('.status-badge');
+                if (badge) badge.remove();
+                
+                const menuNum = card.getAttribute('data-menu');
+                if(menuNum === "1") card.className = "card-kelas kelas-1";
+                if(menuNum === "2") card.className = "card-kelas kelas-2";
+                if(menuNum === "3") card.className = "card-kelas kelas-3";
+                if(menuNum === "4") card.className = "card-kelas kelas-4";
+                if(menuNum === "5") card.className = "card-kelas kelas-5";
+                if(menuNum === "6") card.className = "card-kelas kelas-6";
+            });
         }
 
         function setLoggedOutState() {
             userStatusText.textContent = "Tamu (Belum Login)";
             btnAuthText.textContent = "Masuk";
             btnAuthAction.classList.remove('btn-logout');
-            btnAuthAction.setAttribute('onclick', 'openLoginModal()');
+
+            kelasCards.forEach(card => {
+                card.classList.add('locked');
+                if (!card.querySelector('.status-badge')) {
+                    const badge = document.createElement('div');
+                    badge.className = 'status-badge';
+                    badge.innerHTML = '<i class="fa-solid fa-lock"></i> Terkunci';
+                    card.appendChild(badge);
+                }
+            });
         }
 
         function openLoginModal() {
-            loginError.style.display = 'none';
-            loginModal.classList.add('active');
-            setTimeout(() => usernameInput.focus(), 200);
+            playSoundAndProceed(() => {
+                loginError.style.display = 'none';
+                loginModal.classList.add('active');
+                setTimeout(() => usernameInput.focus(), 200);
+            });
         }
 
         function closeLoginModal() {
-            loginModal.classList.remove('active');
+            playSoundAndProceed(() => {
+                loginModal.classList.remove('active');
+            });
         }
 
-        // --- FITUR SHOW / HIDE PASSWORD DENGAN EMOTIKON PERLIHATKAN/SEMBUNYIKAN ---
         function togglePasswordVisibility() {
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleEmoji.textContent = "🙈"; // Emotikon Sembunyikan Sandi
-                togglePasswordBtn.setAttribute('title', 'Sembunyikan Sandi');
-            } else {
-                passwordInput.type = "password";
-                toggleEmoji.textContent = "👁️"; // Emotikon Perlihatkan Sandi
-                togglePasswordBtn.setAttribute('title', 'Perlihatkan Sandi');
-            }
+            playSoundAndProceed(() => {
+                if (passwordInput.type === "password") {
+                    passwordInput.type = "text";
+                    toggleEmoji.textContent = "🙈";
+                    togglePasswordBtn.setAttribute('title', 'Sembunyikan Sandi');
+                } else {
+                    passwordInput.type = "password";
+                    toggleEmoji.textContent = "👁️";
+                    togglePasswordBtn.setAttribute('title', 'Perlihatkan Sandi');
+                }
+            });
         }
 
-        // --- PROSES VALIDASI LOGIN ---
         function processLogin(event) {
             event.preventDefault();
             const username = usernameInput.value.trim();
             const password = passwordInput.value;
 
-            if (username === VALID_USER && password === VALID_PASS) {
-                loginError.style.display = 'none';
-                
-                // Fitur Always Remember Password
-                if (rememberMeCheckbox.checked) {
-                    localStorage.setItem('pena_remember', 'true');
-                    localStorage.setItem('pena_user', username);
-                    localStorage.setItem('pena_saved_username', username);
-                    localStorage.setItem('pena_saved_password', password);
+            playSoundAndProceed(() => {
+                if (username === VALID_USER && password === VALID_PASS) {
+                    loginError.style.display = 'none';
+                    
+                    if (rememberMeCheckbox.checked) {
+                        localStorage.setItem('pena_remember', 'true');
+                        localStorage.setItem('pena_user', username);
+                        localStorage.setItem('pena_saved_username', username);
+                        localStorage.setItem('pena_saved_password', password);
+                    } else {
+                        localStorage.removeItem('pena_remember');
+                        localStorage.removeItem('pena_user');
+                        localStorage.removeItem('pena_saved_username');
+                        localStorage.removeItem('pena_saved_password');
+                    }
+
+                    sessionStorage.setItem('pena_logged_in', 'true');
+                    sessionStorage.setItem('pena_user', username);
+
+                    loginModal.classList.remove('active');
+                    setLoggedInState(username);
+
+                    setTimeout(() => {
+                        alert(`Selamat datang kembali, ${username}! Login berhasil.`);
+                    }, 100);
+
                 } else {
-                    localStorage.removeItem('pena_remember');
-                    localStorage.removeItem('pena_user');
-                    localStorage.removeItem('pena_saved_username');
-                    localStorage.removeItem('pena_saved_password');
+                    loginError.style.display = 'flex';
+                    document.getElementById('errorMessage').textContent = "Nama pengguna atau kata sandi yang Anda masukkan salah. Silakan coba lagi.";
                 }
-
-                sessionStorage.setItem('pena_logged_in', 'true');
-                sessionStorage.setItem('pena_user', username);
-
-                setLoggedInState(username);
-                closeLoginModal();
-                alert(`Selamat datang kembali, ${username}! Login berhasil.`);
-            } else {
-                loginError.style.display = 'flex';
-                document.getElementById('errorMessage').textContent = "Username atau password salah! (Coba: admin / ikhwan22)";
-            }
+            });
         }
 
         function processLogout() {
-            if (confirm("Apakah Anda yakin ingin keluar?")) {
-                sessionStorage.removeItem('pena_logged_in');
-                sessionStorage.removeItem('pena_user');
-                localStorage.removeItem('pena_remember');
-                localStorage.removeItem('pena_user');
-                setLoggedOutState();
-                alert("Anda telah berhasil keluar.");
-            }
+            playSoundAndProceed(() => {
+                if (confirm("Apakah Anda yakin ingin keluar?")) {
+                    sessionStorage.removeItem('pena_logged_in');
+                    sessionStorage.removeItem('pena_user');
+                    localStorage.removeItem('pena_remember');
+                    localStorage.removeItem('pena_user');
+                    setLoggedOutState();
+                    alert("Anda telah berhasil keluar.");
+                }
+            });
         }
 
         function handleAuthAction() {
@@ -801,54 +1125,44 @@
             }
         }
 
-        // --- KONTROL SUARA & MENGUNCI AKSES JIKA BELUM LOGIN ---
-        const normalMenus = document.querySelectorAll('.card-kelas:not(.card-mystery)');
-        const kelasSound = document.getElementById('kelasSound');
+        // --- INTERAKSI KLIK MENU ---
+        const allInteractiveCards = document.querySelectorAll('.card-kelas, .card-music, .card-epr');
 
-        normalMenus.forEach(menu => {
+        allInteractiveCards.forEach(menu => {
             menu.addEventListener('click', (e) => {
-                const isLoggedIn = sessionStorage.getItem('pena_logged_in') === 'true' || localStorage.getItem('pena_remember') === 'true';
-                
-                if (!isLoggedIn) {
+                const isLocked = menu.classList.contains('locked');
+                const isOffline = menu.classList.contains('offline-file');
+                const targetUrl = menu.getAttribute('href');
+
+                // Jika kelas terkunci
+                if (isLocked) {
                     e.preventDefault();
-                    openLoginModal();
-                    alert("Silakan login terlebih dahulu untuk mengakses menu ini.");
+                    playSoundAndProceed(() => {
+                        openLoginModal();
+                        alert("Menu kelas terkunci! Silakan login terlebih dahulu sebagai guru untuk mengaksesnya.");
+                    });
                     return;
                 }
 
-                const targetUrl = menu.getAttribute('href');
-                
+                // Jika file alat musik berstatus offline / belum tersedia
+                if (isOffline) {
+                    e.preventDefault();
+                    playSoundAndProceed(() => {
+                        alert("⚠️ Halaman ini masih offline atau file belum tersedia di repositori (GitHub). Silakan unggah file terkait terlebih dahulu.");
+                    });
+                    return;
+                }
+
+                // Jika file ada dan siap dibuka
                 if (targetUrl && targetUrl !== '#') {
                     e.preventDefault();
-                    
-                    kelasSound.currentTime = 0;
-                    kelasSound.play().catch(error => {
+                    playSoundAndProceed(() => {
                         window.location.href = targetUrl;
                     });
-
-                    kelasSound.onended = function() {
-                        window.location.href = targetUrl;
-                    };
                 } else {
-                    kelasSound.currentTime = 0; 
-                    kelasSound.play().catch(error => {
-                        console.log("Pemutaran suara diblokir browser sebelum ada interaksi.");
-                    });
-                    kelasSound.onended = null;
+                    e.preventDefault();
+                    playSoundAndProceed();
                 }
-            });
-        });
-
-        // --- KONTROL SUARA MENU MISTERI (SENTUH / HOVER) ---
-        const mysteryMenus = document.querySelectorAll('.card-mystery');
-        const mysterySound = document.getElementById('mysterySound');
-
-        mysteryMenus.forEach(menu => {
-            menu.addEventListener('mouseenter', () => {
-                mysterySound.currentTime = 0;
-                mysterySound.play().catch(error => {
-                    console.log("Browser membutuhkan klik pertama pada halaman sebelum suara hover bisa berbunyi.");
-                });
             });
         });
     </script>
